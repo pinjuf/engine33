@@ -10,9 +10,11 @@
 
 #include "main.h"
 #include "shaders.h"
+#include "camera.h"
+#include "keyboard.h"
 
 GLFWwindow * window;
-GLuint vao;
+PYR_Camera cam;
 
 int main() {
     if (!glfwInit()) {
@@ -24,7 +26,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // OpenGL 4.6
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
-    window = glfwCreateWindow(1920, 1080, "engine33", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "engine33", NULL, NULL);
 
     // Hacky hack because GLFW_FLOATING doesn't work apparently
     system("/bin/i3-msg floating enable");
@@ -46,57 +48,55 @@ int main() {
 
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
+    GLuint vao;
     glGenVertexArrays(1, &vao); // Create and use our VAO
     glBindVertexArray(vao);
 
-    GLuint my_shader = loadShader("../shaders/vp.vert", "../shaders/solid.frag");
+    GLuint my_shader = loadShader("../shaders/mvp.vert", "../shaders/solid.frag");
 
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-    glm::mat4 camera = glm::lookAt(
-        glm::vec3(3, 3, 3),
-        glm::vec3(0, 0, 0),
-        glm::vec3(0, 1, 0)
-    );
+    cam = PYR_Camera(glm::vec3(3, 3, 3), -glm::pi<float>()/4, glm::pi<float>() * 0.75f);
+    glm::mat4 vp;
 
-    glm::mat4 projection = glm::perspective(
-        glm::radians(120.0f),
-        1920.0f/1080.0f,
-        0.1f,
-        100.0f
-    );
+    GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
 
-    glm::mat4 vp = projection * camera;
+    glEnable(GL_DEPTH_TEST);  
 
     do {
+        vp = cam.vpmatrix();
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
         glUseProgram(my_shader);
         glUniform3f(glGetUniformLocation(my_shader, "input_color"), 0.0f, 1.0f, 1.0f);
         glUniformMatrix4fv(glGetUniformLocation(my_shader, "mvp"), 1, GL_FALSE, &vp[0][0]);
 
-        glEnableVertexAttribArray(0); // We pass the vertex through attribute #0
+        glEnableVertexAttribArray(shader_vertex_pos);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
-                0,        // attribute #0
-                sizeof(g_vertex_buffer_data)/sizeof(g_vertex_buffer_data[0])/3, // size
+                shader_vertex_pos,
+                3,
                 GL_FLOAT, // type
                 GL_FALSE, // normalized
                 0,        // stride
                 (void*)0  // offset in buffer
         );
 
-        glDrawArrays(GL_TRIANGLES, 0, sizeof(g_vertex_buffer_data)/sizeof(g_vertex_buffer_data[0])/3); // Draw!
-        glDisableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, 3); // Draw!
+
+        glUniform3f(glGetUniformLocation(my_shader, "input_color"), 1.0f, 0.0f, 1.0f);
+
+        glDrawArrays(GL_TRIANGLES, 3, 6); // Draw!
+
+        glDisableVertexAttribArray(shader_vertex_pos);
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
 
-        vp = projection * camera;
-
+        handle_keyboard();
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
              glfwWindowShouldClose(window) == 0);
 
