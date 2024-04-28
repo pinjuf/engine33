@@ -42,6 +42,8 @@ glm::mat4 PYR_Camera::viewmatrix() {
 }
 
 glm::vec3 PYR_Camera::forward() {
+    clamp();
+
     glm::vec3 out;
 
     out.x = -glm::sin(yaw);
@@ -53,4 +55,9 @@ glm::vec3 PYR_Camera::forward() {
 
 glm::vec3 PYR_Camera::up() {
     return glm::rotate(glm::mat4(1.0f), roll, forward()) * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+}
+
+void PYR_Camera::clamp() {
+    // Restrict pitch from going beyond 90 degress etc.
+    pitch = glm::clamp(pitch, -glm::pi<float>()/2 + 0.001f, +glm::pi<float>()/2 - 0.001f);
 }

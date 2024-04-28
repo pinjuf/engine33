@@ -1,6 +1,6 @@
 #version 460 core
 
-// Basic View-Projection vertex shader
+// Basic Model-View-Projection vertex shader
 
 in vec3 vertpos_model;
 

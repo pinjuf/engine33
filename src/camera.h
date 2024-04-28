@@ -34,4 +34,7 @@ class PYR_Camera : public Camera {
 
         glm::vec3 forward();
         glm::vec3 up();
+
+    private:
+        void clamp();
 };
