@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "camera.h"
-#include "shaders.h"
+#include "shader.h"
 
 extern GLFWwindow * window;
 

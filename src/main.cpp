@@ -9,7 +9,7 @@
 #include <glm/ext/scalar_constants.hpp> // glm::pi
 
 #include "main.h"
-#include "shaders.h"
+#include "shader.h"
 #include "camera.h"
 #include "keyboard.h"
 #include "mouse.h"
