@@ -16,26 +16,16 @@ class Camera {
 
         float fov = 100; // degrees
 
-        virtual glm::mat4 viewmatrix();
-        virtual glm::mat4 projectionmatrix();
+        glm::mat4 orientation = glm::mat4(1.0f);
+
+        glm::mat4 viewmatrix();
+        glm::mat4 projectionmatrix();
         glm::mat4 vpmatrix();
-};
-
-// Pitch-yaw camera
-class PYR_Camera : public Camera {
-    public:
-        using Camera::Camera;
-        PYR_Camera(glm::vec3 position, float pitch, float yaw);
-        float pitch = 0;
-        float yaw = 0;
-        float roll = 0; // TODO: Add "true" (better) roll
-
-        glm::mat4 viewmatrix() override;
 
         glm::vec3 forward();
         glm::vec3 right();
         glm::vec3 up();
 
-    private:
-        void clamp();
+        void chyaw_g(float delta); // _g because this rotates around the GLOBAL up axis
+        void chpitch(float delta);
 };

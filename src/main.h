@@ -15,9 +15,12 @@ static const GLfloat g_vertex_buffer_data[] = {
    -1.0f, -1.0f, 1.0f,
    1.0f, -1.0f, 1.0f,
    0.0f,  1.0f, 1.0f,
+   -1.0f, -1.0f, -1.0f,
+   1.0f, -1.0f, -1.0f,
+   0.0f,  1.0f, -1.0f,
 };
 
-extern PYR_Camera cam;
+extern Camera cam;
 
 extern double seconds; // Time since the program has been running
 extern double deltaT;

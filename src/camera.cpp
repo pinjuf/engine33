@@ -8,7 +8,11 @@ Camera::Camera(glm::vec3 position) {
 }
 
 glm::mat4 Camera::viewmatrix() {
-    return glm::mat4();
+    return glm::lookAt(
+            position,
+            position + glm::vec3(orientation * glm::vec4(FORWARD, 1.0f)),
+            glm::vec3(orientation * glm::vec4(UP, 1.0f))
+    );
 }
 
 glm::mat4 Camera::projectionmatrix() {
@@ -24,52 +28,23 @@ glm::mat4 Camera::vpmatrix() {
     return this->projectionmatrix() * this->viewmatrix();
 }
 
-PYR_Camera::PYR_Camera(glm::vec3 position, float pitch, float yaw) {
-    this->position = position;
-    this->pitch = pitch;
-    this->yaw = yaw;
+glm::vec3 Camera::forward() {
+    return orientation * glm::vec4(FORWARD, 0.0f);
 }
 
-glm::mat4 PYR_Camera::viewmatrix() {
-    // Minecraft style: +Z is south and 0 degrees, clockwise pitch
-    glm::vec3 target = forward();
-
-    return glm::lookAt(
-            position,
-            position + target,
-            up()
-    );
+glm::vec3 Camera::right() {
+    return orientation * glm::vec4(RIGHT, 0.0f);
 }
 
-glm::vec3 PYR_Camera::forward() {
-    clamp();
-
-    glm::vec3 out;
-
-    out.x = -glm::sin(yaw);
-    out.z = glm::cos(yaw);
-    out.y = glm::tan(pitch);
-
-    return glm::normalize(out);
+glm::vec3 Camera::up() {
+    return orientation * glm::vec4(UP, 0.0f);
 }
 
-glm::vec3 PYR_Camera::right() {
-    clamp();
-
-    glm::vec3 out;
-
-    out.x = -glm::cos(yaw);
-    out.z = -glm::sin(yaw);
-    out.y = 0;
-
-    return glm::rotate(glm::mat4(1.0f), roll, forward()) * glm::vec4(out, 1.0f);
+void Camera::chyaw_g(float delta) {
+    // We have Minecraft-like yaw
+    orientation = glm::rotate(glm::mat4(1.0f), -delta, UP) * orientation;
 }
 
-glm::vec3 PYR_Camera::up() {
-    return glm::rotate(glm::mat4(1.0f), roll, forward()) * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-}
-
-void PYR_Camera::clamp() {
-    // Restrict pitch from going beyond 90 degress etc.
-    pitch = glm::clamp(pitch, -glm::pi<float>()/2 + 0.001f, +glm::pi<float>()/2 - 0.001f);
+void Camera::chpitch(float delta) {
+    orientation = glm::rotate(glm::mat4(1.0f), delta, right()) * orientation;
 }

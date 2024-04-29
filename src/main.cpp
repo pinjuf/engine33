@@ -15,7 +15,7 @@
 #include "mouse.h"
 
 GLFWwindow * window;
-PYR_Camera cam;
+Camera cam;
 
 double seconds;
 double deltaT;
@@ -70,12 +70,13 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-    cam = PYR_Camera(glm::vec3(3, 3, 3), -glm::pi<float>()/4, glm::pi<float>() * 0.75f);
+    cam = Camera(glm::vec3(3, 3, 3));
     glm::mat4 vp;
 
     GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
 
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     glfwSetTime(0);
     seconds = glfwGetTime();
@@ -86,7 +87,6 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
         glUseProgram(my_shader);
-        glUniform3f(glGetUniformLocation(my_shader, "input_color"), 0.0f, 1.0f, 1.0f);
         glUniformMatrix4fv(glGetUniformLocation(my_shader, "mvp"), 1, GL_FALSE, &vp[0][0]);
 
         glEnableVertexAttribArray(shader_vertex_pos);
@@ -100,11 +100,16 @@ int main() {
                 (void*)0  // offset in buffer
         );
 
+        glUniform3f(glGetUniformLocation(my_shader, "input_color"), 0.0f, 1.0f, 1.0f);
         glDrawArrays(GL_TRIANGLES, 0, 3); // Draw!
 
+        glUseProgram(my_shader);
         glUniform3f(glGetUniformLocation(my_shader, "input_color"), 1.0f, 0.0f, 1.0f);
-
         glDrawArrays(GL_TRIANGLES, 3, 6); // Draw!
+
+        glUseProgram(my_shader);
+        glUniform3f(glGetUniformLocation(my_shader, "input_color"), 1.0f, 1.0f, 0.0f);
+        glDrawArrays(GL_TRIANGLES, 6, 9); // Draw!
 
         glDisableVertexAttribArray(shader_vertex_pos);
 
@@ -116,6 +121,7 @@ int main() {
 
         handle_keyboard();
         handle_mouse();
+
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
              glfwWindowShouldClose(window) == 0);
 
