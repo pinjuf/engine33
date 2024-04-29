@@ -12,9 +12,13 @@
 #include "shaders.h"
 #include "camera.h"
 #include "keyboard.h"
+#include "mouse.h"
 
 GLFWwindow * window;
 PYR_Camera cam;
+
+double seconds;
+double deltaT;
 
 int main() {
     if (!glfwInit()) {
@@ -46,6 +50,13 @@ int main() {
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE); // Should be changed for better controls
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    if (!glfwRawMouseMotionSupported()) {
+        std::cerr << "Couldn't get raw cursor motion" << std::endl;
+        return -1;
+    }
+    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
     GLuint vao;
@@ -64,7 +75,10 @@ int main() {
 
     GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
 
-    glEnable(GL_DEPTH_TEST);  
+    glEnable(GL_DEPTH_TEST);
+
+    glfwSetTime(0);
+    seconds = glfwGetTime();
 
     do {
         vp = cam.vpmatrix();
@@ -96,7 +110,12 @@ int main() {
 
         glfwSwapBuffers(window);
 
+        double new_seconds = glfwGetTime();
+        deltaT = new_seconds - seconds;
+        seconds = new_seconds;
+
         handle_keyboard();
+        handle_mouse();
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
              glfwWindowShouldClose(window) == 0);
 

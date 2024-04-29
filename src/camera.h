@@ -28,11 +28,12 @@ class PYR_Camera : public Camera {
         PYR_Camera(glm::vec3 position, float pitch, float yaw);
         float pitch = 0;
         float yaw = 0;
-        float roll = 0;
+        float roll = 0; // TODO: Add "true" (better) roll
 
         glm::mat4 viewmatrix() override;
 
         glm::vec3 forward();
+        glm::vec3 right();
         glm::vec3 up();
 
     private:

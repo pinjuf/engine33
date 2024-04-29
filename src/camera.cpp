@@ -53,6 +53,18 @@ glm::vec3 PYR_Camera::forward() {
     return glm::normalize(out);
 }
 
+glm::vec3 PYR_Camera::right() {
+    clamp();
+
+    glm::vec3 out;
+
+    out.x = -glm::cos(yaw);
+    out.z = -glm::sin(yaw);
+    out.y = 0;
+
+    return glm::rotate(glm::mat4(1.0f), roll, forward()) * glm::vec4(out, 1.0f);
+}
+
 glm::vec3 PYR_Camera::up() {
     return glm::rotate(glm::mat4(1.0f), roll, forward()) * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 }
