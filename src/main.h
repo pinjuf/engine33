@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "camera.h"
+#include "shaders.h"
 
 extern GLFWwindow * window;
 
@@ -20,7 +21,20 @@ static const GLfloat g_vertex_buffer_data[] = {
    0.0f,  1.0f, -1.0f,
 };
 
+static const GLfloat g_vertex_buffer_color[] = {
+   1.0f,  0.0f, 0.0f,
+   0.0f,  1.0f, 0.0f,
+   0.0f, 0.0f, 1.0f,
+   0.0f, 0.0f, 1.0f,
+   1.0f,  0.0f, 0.0f,
+   0.0f,  1.0f, 0.0f,
+   0.0f,  1.0f, 0.0f,
+   0.0f, 0.0f, 1.0f,
+   1.0f,  0.0f, 0.0f,
+};
+
 extern Camera cam;
+extern ShaderManager shadermanager;
 
 extern double seconds; // Time since the program has been running
 extern double deltaT;

@@ -15,6 +15,8 @@
 #include "mouse.h"
 
 GLFWwindow * window;
+
+ShaderManager shadermanager;
 Camera cam;
 
 double seconds;
@@ -59,27 +61,62 @@ int main() {
 
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
-    GLuint vao;
-    glGenVertexArrays(1, &vao); // Create and use our VAO
-    glBindVertexArray(vao);
+    shadermanager = ShaderManager();
+    GLuint my_shader = shadermanager.link_program(
+        shadermanager.load_shader(GL_VERTEX_SHADER, "../shaders/mvp.vert"),
+        shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/solid_interp.frag")
+    );
 
-    GLuint my_shader = loadShader("../shaders/mvp.vert", "../shaders/solid.frag");
+    GLuint vao;
 
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
+    GLuint colorbuffer;
+    glGenBuffers(1, &colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_color), g_vertex_buffer_color, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &vao); // Create and use our VAO
+    glBindVertexArray(vao);
+
     cam = Camera(glm::vec3(3, 3, 3));
     glm::mat4 vp;
 
     GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
+    GLuint shader_color_pos = glGetAttribLocation(my_shader, "vertex_color");
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glVertexAttribPointer(
+            shader_vertex_pos,
+            3,
+            GL_FLOAT, // type
+            GL_FALSE, // normalized
+            0,        // stride
+            (void*)0  // offset in buffer
+    );
+
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glVertexAttribPointer(
+            shader_color_pos,
+            3,
+            GL_FLOAT, // type
+            GL_FALSE, // normalized
+            0,        // stride
+            (void*)0  // offset in buffer
+    );
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
 
     glfwSetTime(0);
     seconds = glfwGetTime();
+
+    size_t i = 0;
 
     do {
         vp = cam.vpmatrix();
@@ -87,31 +124,20 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
         glUseProgram(my_shader);
+
         glUniformMatrix4fv(glGetUniformLocation(my_shader, "mvp"), 1, GL_FALSE, &vp[0][0]);
 
+        glBindVertexArray(vao);
+
         glEnableVertexAttribArray(shader_vertex_pos);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-        glVertexAttribPointer(
-                shader_vertex_pos,
-                3,
-                GL_FLOAT, // type
-                GL_FALSE, // normalized
-                0,        // stride
-                (void*)0  // offset in buffer
-        );
+        glEnableVertexAttribArray(shader_color_pos);
 
-        glUniform3f(glGetUniformLocation(my_shader, "input_color"), 0.0f, 1.0f, 1.0f);
-        glDrawArrays(GL_TRIANGLES, 0, 3); // Draw!
-
-        glUseProgram(my_shader);
-        glUniform3f(glGetUniformLocation(my_shader, "input_color"), 1.0f, 0.0f, 1.0f);
-        glDrawArrays(GL_TRIANGLES, 3, 6); // Draw!
-
-        glUseProgram(my_shader);
-        glUniform3f(glGetUniformLocation(my_shader, "input_color"), 1.0f, 1.0f, 0.0f);
-        glDrawArrays(GL_TRIANGLES, 6, 9); // Draw!
+        glDrawArrays(GL_TRIANGLES, 0, 9); // Draw!
 
         glDisableVertexAttribArray(shader_vertex_pos);
+        glDisableVertexAttribArray(shader_color_pos);
+
+        glBindVertexArray(0);
 
         glfwSwapBuffers(window);
 
@@ -121,6 +147,11 @@ int main() {
 
         handle_keyboard();
         handle_mouse();
+
+        i++;
+        if (i % 100 == 0)
+            printf("FPS = %f\n", 1/deltaT);
+            //printf("FPS = %f\n", i/seconds); // For average
 
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
              glfwWindowShouldClose(window) == 0);
