@@ -72,10 +72,10 @@ int main() {
     );
 
     Mesh my_mesh;
-    my_mesh.load_wfobj("../models/kaczd20.obj");
+    my_mesh.load_wfobj("../models/monke.obj");
 
     int texw, texh, nchans;
-    unsigned char * my_texture_data = stbi_load("../textures/kaczd20.png", &texw, &texh, &nchans, 0);
+    unsigned char * my_texture_data = stbi_load("../textures/god.png", &texw, &texh, &nchans, 0);
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -103,8 +103,8 @@ int main() {
     cam = Camera(glm::vec3(0.0f, 0.0f, -5.0f));
     glm::mat4 mvp;
 
-    GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
-    GLuint shader_uv_pos = glGetAttribLocation(my_shader, "vertuv");
+    GLint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
+    GLint shader_uv_pos = glGetAttribLocation(my_shader, "vertuv");
 
     glBindVertexArray(vao);
 
@@ -132,6 +132,7 @@ int main() {
     glBindVertexArray(0);
 
     glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
 
     glfwSetTime(0);
     seconds = glfwGetTime();
@@ -139,7 +140,7 @@ int main() {
     size_t i = 0;
 
     do {
-        mvp = cam.vpmatrix() * glm::rotate(glm::mat4(1.0f), (float)seconds, UP);
+        mvp = cam.vpmatrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
