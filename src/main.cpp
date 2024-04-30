@@ -13,6 +13,10 @@
 #include "camera.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "mesh.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 GLFWwindow * window;
 
@@ -59,7 +63,7 @@ int main() {
     }
     glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
-    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
 
     shadermanager = ShaderManager();
     GLuint my_shader = shadermanager.link_program(
@@ -67,58 +71,20 @@ int main() {
         shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/solid_interp.frag")
     );
 
-    GLfloat vertex_pos_data[] = {
-       -1.0f, -1.0f, -1.0f,
-       1.0f, -1.0f, -1.0f,
-       0.0f,  1.0f, -1.0f,
-       -1.0f, -1.0f, 0.0f,
-       1.0f, -1.0f, 0.0f,
-       0.0f,  1.0f, 0.0f,
-       -1.0f, -1.0f, 1.0f,
-       1.0f, -1.0f, 1.0f,
-       0.0f,  1.0f, 1.0f,
-    };
-
-    GLfloat vertex_color_data[] = {
-        1.0f,  0.0f, 0.0f,
-        0.0f,  1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f,  1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        1.0f,  0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        1.0f,  0.0f, 0.0f,
-        0.0f,  1.0f, 0.0f,
-    };
-
-    GLuint indices_data[] = {
-        6, 7, 8,
-        0, 1, 2,
-        3, 4, 5,
-        0, 1, 3,
-        1, 3, 4,
-        3, 6, 5,
-        5, 8, 6,
-    };
+    Mesh my_mesh;
+    my_mesh.load_wfobj("../models/kaczd20.obj");
 
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_pos_data), vertex_pos_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, my_mesh.vertices.size() * 4, &my_mesh.vertices[0], GL_STATIC_DRAW);
 
     GLuint colorbuffer;
     glGenBuffers(1, &colorbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_color_data), vertex_color_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, my_mesh.normals.size() * 4, &my_mesh.normals[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    GLuint indices;
-    glGenBuffers(1, &indices);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_data), indices_data, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     GLuint vao;
     glGenVertexArrays(1, &vao); // Create and use our VAO
@@ -127,7 +93,7 @@ int main() {
     glm::mat4 vp;
 
     GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
-    GLuint shader_color_pos = glGetAttribLocation(my_shader, "vertex_color");
+    GLuint shader_uv_pos = glGetAttribLocation(my_shader, "ivertex_color");
 
     glBindVertexArray(vao);
 
@@ -143,8 +109,8 @@ int main() {
 
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
     glVertexAttribPointer(
-            shader_color_pos,
-            3,        // vec3
+            shader_uv_pos,
+            3,        // vec2
             GL_FLOAT, // type
             GL_FALSE, // normalized
             0,        // stride
@@ -173,19 +139,19 @@ int main() {
         glBindVertexArray(vao);
 
         glEnableVertexAttribArray(shader_vertex_pos);
-        glEnableVertexAttribArray(shader_color_pos);
+        glEnableVertexAttribArray(shader_uv_pos);
 
-        //glDrawArrays(GL_TRIANGLES, 0, 9); // Draw!
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
+        glDrawArrays(GL_TRIANGLES, 0, my_mesh.vertices.size()); // Draw!
+        /*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
         glDrawElements(
                 GL_TRIANGLES,
-                sizeof(indices_data)/sizeof(indices_data[0]),
+                my_mesh.vertices.size()/3,
                 GL_UNSIGNED_INT,
                 (void*)0
-        );
+        );*/
 
         glDisableVertexAttribArray(shader_vertex_pos);
-        glDisableVertexAttribArray(shader_color_pos);
+        glDisableVertexAttribArray(shader_uv_pos);
 
         glBindVertexArray(0);
 

@@ -19,7 +19,7 @@ glm::mat4 Camera::projectionmatrix() {
     return glm::perspective(
             glm::radians(fov),
             (float)WIDTH/HEIGHT,
-            0.1f,
+            0.01f,
             100.f
     );
 }

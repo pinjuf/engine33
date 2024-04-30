@@ -4,8 +4,8 @@
 
 out vec3 fragment_color;
 
-in vec3 ivertex_color;
+in vec3 vertex_color;
 
 void main() {
-  fragment_color = ivertex_color;
+  fragment_color = vertex_color;
 }
