@@ -72,7 +72,7 @@ int main() {
     );
 
     Mesh my_mesh;
-    my_mesh.load_wfobj("../models/kaczd20.obj");
+    my_mesh.load_wfobj("../models/selfportrait.obj");
 
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
@@ -89,8 +89,8 @@ int main() {
     GLuint vao;
     glGenVertexArrays(1, &vao); // Create and use our VAO
 
-    cam = Camera(glm::vec3(0.0f, 0.5f, -1.5f));
-    glm::mat4 vp;
+    cam = Camera(glm::vec3(0.0f, 0.0f, -1.5f));
+    glm::mat4 mvp;
 
     GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
     GLuint shader_uv_pos = glGetAttribLocation(my_shader, "ivertex_color");
@@ -128,13 +128,13 @@ int main() {
     size_t i = 0;
 
     do {
-        vp = cam.vpmatrix();
+        mvp = cam.vpmatrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
         glUseProgram(my_shader);
 
-        glUniformMatrix4fv(glGetUniformLocation(my_shader, "mvp"), 1, GL_FALSE, &vp[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(my_shader, "mvp"), 1, GL_FALSE, &mvp[0][0]);
 
         glBindVertexArray(vao);
 
