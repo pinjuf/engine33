@@ -74,22 +74,15 @@ int main() {
     Mesh my_mesh;
     my_mesh.load_wfobj("../models/kaczd20.obj");
 
-    GLfloat my_texture_data[] = {
-        1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1,
-        0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0,
-        1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1,
-        0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0,
-        1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1,
-        0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0,
-        1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1,
-        0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0,
-    };
+    int texw, texh, nchans;
+    unsigned char * my_texture_data = stbi_load("../textures/kaczd20.png", &texw, &texh, &nchans, 0);
+
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 8, 8, 0, GL_RGB, GL_FLOAT, my_texture_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texw, texh, 0, GL_RGB, GL_UNSIGNED_BYTE, my_texture_data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     GLuint vertexbuffer;
@@ -107,7 +100,7 @@ int main() {
     GLuint vao;
     glGenVertexArrays(1, &vao); // Create and use our VAO
 
-    cam = Camera(glm::vec3(0.0f, 0.0f, -1.5f));
+    cam = Camera(glm::vec3(0.0f, 0.0f, -5.0f));
     glm::mat4 mvp;
 
     GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
@@ -146,7 +139,7 @@ int main() {
     size_t i = 0;
 
     do {
-        mvp = cam.vpmatrix();
+        mvp = cam.vpmatrix() * glm::rotate(glm::mat4(1.0f), (float)seconds, UP);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
