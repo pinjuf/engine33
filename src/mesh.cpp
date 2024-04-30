@@ -18,10 +18,13 @@ void Mesh::load_wfobj(const char * path) {
     vertices.clear();
     uvs.clear();
     normals.clear();
+    indices.clear();
 
     std::vector<glm::vec3> v{{0.0f, 0.0f, 0.0f}};
     std::vector<glm::vec2> vt{{0.0f, 0.0f}};
     std::vector<glm::vec3> vn{{0.0f, 0.0f, 0.0f}};
+
+    std::vector<std::string> f{};
 
     while (true) {
         char token[128];
@@ -45,45 +48,44 @@ void Mesh::load_wfobj(const char * path) {
         } else if (!strcmp(token, "f")) { // Indices
             // Note how we assume we already have the points referred to by the indices in our temporary v, vt & vn
 
-            unsigned int indices0[3], indices1[3], indices2[3];
-            fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", 
-                    &indices0[0],
-                    &indices0[1],
-                    &indices0[2],
-                    &indices1[0],
-                    &indices1[1],
-                    &indices1[2],
-                    &indices2[0],
-                    &indices2[1],
-                    &indices2[2]
-            );
-
-            vertices.push_back(v[indices0[0]].x);
-            vertices.push_back(v[indices0[0]].y);
-            vertices.push_back(v[indices0[0]].z);
-            vertices.push_back(v[indices1[0]].x);
-            vertices.push_back(v[indices1[0]].y);
-            vertices.push_back(v[indices1[0]].z);
-            vertices.push_back(v[indices2[0]].x);
-            vertices.push_back(v[indices2[0]].y);
-            vertices.push_back(v[indices2[0]].z);
-
-            uvs.push_back(vt[indices0[1]].x);
-            uvs.push_back(vt[indices0[1]].y);
-            uvs.push_back(vt[indices1[1]].x);
-            uvs.push_back(vt[indices1[1]].y);
-            uvs.push_back(vt[indices2[1]].x);
-            uvs.push_back(vt[indices2[1]].y);
-
-            normals.push_back(vn[indices0[2]].x);
-            normals.push_back(vn[indices0[2]].y);
-            normals.push_back(vn[indices0[2]].z);
-            normals.push_back(vn[indices1[2]].x);
-            normals.push_back(vn[indices1[2]].y);
-            normals.push_back(vn[indices1[2]].z);
-            normals.push_back(vn[indices2[2]].x);
-            normals.push_back(vn[indices2[2]].y);
-            normals.push_back(vn[indices2[2]].z);
+            for (uint8_t i = 0; i < 3; i++) {
+                char index[128];
+                fscanf(file, "%s", index);
+                f.push_back(std::string(index));
+            }
         }
+    }
+
+    // If an index group ("ddd/ddd/ddd") is already known (all 3 indices match exactly, we can reuse the index)
+    std::map<std::string, GLuint> known_indices;
+    for (std::string index_group : f) {
+
+        auto known = known_indices.find(index_group);
+        if (known != known_indices.end()) {
+            std::cout << "Reusing IG " << known->first << std::endl;
+            indices.push_back(known->second);
+            continue;
+        }
+
+        int vert_index, uv_index, norm_index;
+        sscanf(index_group.c_str(), "%d/%d/%d", &vert_index, &uv_index, &norm_index);
+
+        glm::vec3 V = v[vert_index];
+        glm::vec2 VT = vt[uv_index];
+        glm::vec3 VN = vn[norm_index];
+
+        indices.push_back(vertices.size()/3); // We do this BEFORE pushing our values!
+        known_indices[index_group] = indices.back();
+
+        vertices.push_back(V.x);
+        vertices.push_back(V.y);
+        vertices.push_back(V.z);
+
+        uvs.push_back(VT.x);
+        uvs.push_back(VT.y);
+
+        normals.push_back(VN.x);
+        normals.push_back(VN.y);
+        normals.push_back(VN.z);
     }
 }

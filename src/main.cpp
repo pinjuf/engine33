@@ -75,7 +75,7 @@ int main() {
     my_mesh.load_wfobj("../models/monke.obj");
 
     int texw, texh, nchans;
-    unsigned char * my_texture_data = stbi_load("../textures/god.png", &texw, &texh, &nchans, 0);
+    unsigned char * my_texture_data = stbi_load("../textures/kaczd20.png", &texw, &texh, &nchans, 0);
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -94,8 +94,13 @@ int main() {
     glGenBuffers(1, &uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
     glBufferData(GL_ARRAY_BUFFER, my_mesh.uvs.size() * 4, &my_mesh.uvs[0], GL_STATIC_DRAW);
-
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    GLuint indexbuffer;
+    glGenBuffers(1, &indexbuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, my_mesh.indices.size() * 4, &my_mesh.indices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     GLuint vao;
     glGenVertexArrays(1, &vao); // Create and use our VAO
@@ -155,14 +160,13 @@ int main() {
 
         glBindTexture(GL_TEXTURE_2D, texture);;
         glActiveTexture(GL_TEXTURE0);
-        glDrawArrays(GL_TRIANGLES, 0, my_mesh.vertices.size()); // Draw!
-        /*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
-        glDrawElements(
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+        glDrawElements( // Draw!
                 GL_TRIANGLES,
-                my_mesh.vertices.size()/3,
+                my_mesh.indices.size(),
                 GL_UNSIGNED_INT,
                 (void*)0
-        );*/
+        );
 
         glDisableVertexAttribArray(shader_vertex_pos);
         glDisableVertexAttribArray(shader_uv_pos);
