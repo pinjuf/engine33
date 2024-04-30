@@ -67,26 +67,69 @@ int main() {
         shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/solid_interp.frag")
     );
 
-    GLuint vao;
+    GLfloat vertex_pos_data[] = {
+       -1.0f, -1.0f, -1.0f,
+       1.0f, -1.0f, -1.0f,
+       0.0f,  1.0f, -1.0f,
+       -1.0f, -1.0f, 0.0f,
+       1.0f, -1.0f, 0.0f,
+       0.0f,  1.0f, 0.0f,
+       -1.0f, -1.0f, 1.0f,
+       1.0f, -1.0f, 1.0f,
+       0.0f,  1.0f, 1.0f,
+    };
+
+    GLfloat vertex_color_data[] = {
+        1.0f,  0.0f, 0.0f,
+        0.0f,  1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f,  1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        1.0f,  0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        1.0f,  0.0f, 0.0f,
+        0.0f,  1.0f, 0.0f,
+    };
+
+    GLuint indices_data[] = {
+        6, 7, 8,
+        0, 1, 2,
+        3, 4, 5,
+        0, 1, 3,
+        1, 3, 4,
+        3, 6, 5,
+        5, 8, 6,
+    };
 
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_pos_data), vertex_pos_data, GL_STATIC_DRAW);
 
     GLuint colorbuffer;
     glGenBuffers(1, &colorbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_color), g_vertex_buffer_color, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_color_data), vertex_color_data, GL_STATIC_DRAW);
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    GLuint indices;
+    glGenBuffers(1, &indices);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_data), indices_data, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    GLuint vao;
     glGenVertexArrays(1, &vao); // Create and use our VAO
-    glBindVertexArray(vao);
 
-    cam = Camera(glm::vec3(3, 3, 3));
+    cam = Camera(glm::vec3(0.0f, 0.5f, -1.5f));
     glm::mat4 vp;
 
     GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
     GLuint shader_color_pos = glGetAttribLocation(my_shader, "vertex_color");
+
+    glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glVertexAttribPointer(
@@ -101,7 +144,7 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
     glVertexAttribPointer(
             shader_color_pos,
-            3,
+            3,        // vec3
             GL_FLOAT, // type
             GL_FALSE, // normalized
             0,        // stride
@@ -132,7 +175,14 @@ int main() {
         glEnableVertexAttribArray(shader_vertex_pos);
         glEnableVertexAttribArray(shader_color_pos);
 
-        glDrawArrays(GL_TRIANGLES, 0, 9); // Draw!
+        //glDrawArrays(GL_TRIANGLES, 0, 9); // Draw!
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
+        glDrawElements(
+                GL_TRIANGLES,
+                sizeof(indices_data)/sizeof(indices_data[0]),
+                GL_UNSIGNED_INT,
+                (void*)0
+        );
 
         glDisableVertexAttribArray(shader_vertex_pos);
         glDisableVertexAttribArray(shader_color_pos);
@@ -149,11 +199,11 @@ int main() {
         handle_mouse();
 
         i++;
-        if (i % 100 == 0)
+        if (i % 240 == 0)
             printf("FPS = %f\n", 1/deltaT);
             //printf("FPS = %f\n", i/seconds); // For average
 
-    } while (glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+    } while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
              glfwWindowShouldClose(window) == 0);
 
     return 0;

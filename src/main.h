@@ -9,30 +9,6 @@
 
 extern GLFWwindow * window;
 
-static const GLfloat g_vertex_buffer_data[] = {
-   -1.0f, -1.0f, 0.0f,
-   1.0f, -1.0f, 0.0f,
-   0.0f,  1.0f, 0.0f,
-   -1.0f, -1.0f, 1.0f,
-   1.0f, -1.0f, 1.0f,
-   0.0f,  1.0f, 1.0f,
-   -1.0f, -1.0f, -1.0f,
-   1.0f, -1.0f, -1.0f,
-   0.0f,  1.0f, -1.0f,
-};
-
-static const GLfloat g_vertex_buffer_color[] = {
-   1.0f,  0.0f, 0.0f,
-   0.0f,  1.0f, 0.0f,
-   0.0f, 0.0f, 1.0f,
-   0.0f, 0.0f, 1.0f,
-   1.0f,  0.0f, 0.0f,
-   0.0f,  1.0f, 0.0f,
-   0.0f,  1.0f, 0.0f,
-   0.0f, 0.0f, 1.0f,
-   1.0f,  0.0f, 0.0f,
-};
-
 extern Camera cam;
 extern ShaderManager shadermanager;
 
