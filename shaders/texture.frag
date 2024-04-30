@@ -1,13 +1,13 @@
 #version 460 core
 
-// Shades through texture sampling
+// Shades in a "solid" color, interpolated by the vertex
 
 out vec3 fragment_color;
 
 in vec2 uv;
 
-uniform sampler2D texture_0;
+uniform sampler2D tex;
 
 void main() {
-   fragment_color = texture(texture_0, uv).rgb;
+  fragment_color = texture(tex, uv).rgb;
 }

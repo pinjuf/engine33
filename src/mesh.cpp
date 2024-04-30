@@ -74,7 +74,6 @@ void Mesh::load_wfobj(const char * path) {
             uvs.push_back(vt[indices2[1]].x);
             uvs.push_back(vt[indices2[1]].y);
 
-            /*
             normals.push_back(vn[indices0[2]].x);
             normals.push_back(vn[indices0[2]].y);
             normals.push_back(vn[indices0[2]].z);
@@ -84,10 +83,6 @@ void Mesh::load_wfobj(const char * path) {
             normals.push_back(vn[indices2[2]].x);
             normals.push_back(vn[indices2[2]].y);
             normals.push_back(vn[indices2[2]].z);
-            */
-            for (size_t i = 0; i < 9; i++) {
-                normals.push_back((rand() % 1000)/1000.0f);
-            }
         }
     }
 }

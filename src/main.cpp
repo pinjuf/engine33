@@ -67,22 +67,40 @@ int main() {
 
     shadermanager = ShaderManager();
     GLuint my_shader = shadermanager.link_program(
-        shadermanager.load_shader(GL_VERTEX_SHADER, "../shaders/mvp.vert"),
-        shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/solid_interp.frag")
+        shadermanager.load_shader(GL_VERTEX_SHADER, "../shaders/mvp_uv.vert"),
+        shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/texture.frag")
     );
 
     Mesh my_mesh;
-    my_mesh.load_wfobj("../models/selfportrait.obj");
+    my_mesh.load_wfobj("../models/kaczd20.obj");
+
+    GLfloat my_texture_data[] = {
+        1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1,
+        0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0,
+        1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1,
+        0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0,
+        1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1,
+        0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0,
+        1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1,
+        0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0, 0,0,1, 1,0,0,
+    };
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 8, 8, 0, GL_RGB, GL_FLOAT, my_texture_data);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, my_mesh.vertices.size() * 4, &my_mesh.vertices[0], GL_STATIC_DRAW);
 
-    GLuint colorbuffer;
-    glGenBuffers(1, &colorbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, my_mesh.normals.size() * 4, &my_mesh.normals[0], GL_STATIC_DRAW);
+    GLuint uvbuffer;
+    glGenBuffers(1, &uvbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+    glBufferData(GL_ARRAY_BUFFER, my_mesh.uvs.size() * 4, &my_mesh.uvs[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -93,24 +111,24 @@ int main() {
     glm::mat4 mvp;
 
     GLuint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
-    GLuint shader_uv_pos = glGetAttribLocation(my_shader, "ivertex_color");
+    GLuint shader_uv_pos = glGetAttribLocation(my_shader, "vertuv");
 
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glVertexAttribPointer(
             shader_vertex_pos,
-            3,
+            3,        // vec3
             GL_FLOAT, // type
             GL_FALSE, // normalized
             0,        // stride
             (void*)0  // offset in buffer
     );
 
-    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER,uvbuffer);
     glVertexAttribPointer(
             shader_uv_pos,
-            3,        // vec2
+            2,        // vec2
             GL_FLOAT, // type
             GL_FALSE, // normalized
             0,        // stride
@@ -141,6 +159,8 @@ int main() {
         glEnableVertexAttribArray(shader_vertex_pos);
         glEnableVertexAttribArray(shader_uv_pos);
 
+        glBindTexture(GL_TEXTURE_2D, texture);;
+        glActiveTexture(GL_TEXTURE0);
         glDrawArrays(GL_TRIANGLES, 0, my_mesh.vertices.size()); // Draw!
         /*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
         glDrawElements(
