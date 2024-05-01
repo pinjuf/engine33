@@ -73,3 +73,80 @@ GLuint ShaderManager::link_program(GLuint vert, GLuint frag) {
 
     return id;
 }
+
+void ShaderManager::update_mesh_bufs(GLuint shader, Mesh mesh) {
+    // Update the vertex attributes (the connection between the mesh's buffer and the shaders)
+
+    GLint vertexposition = glGetAttribLocation(shader, "e33_vertexposition");
+    GLint vertexuv       = glGetAttribLocation(shader, "e33_vertexuv");
+    GLint vertexnormal   = glGetAttribLocation(shader, "e33_vertexnormal");
+    GLint vertexcolor    = glGetAttribLocation(shader, "e33_vertexcolor");
+
+    glBindVertexArray(mesh.vao);
+
+    // TODO: this is ugly
+    if (vertexposition != -1) {
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.glbufs.vertices_buffer);
+        glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(GLfloat), &mesh.vertices[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(
+            vertexposition,
+            3,        // vec3
+            GL_FLOAT, // type
+            GL_FALSE, // normalized?
+            0,        // stride
+            (void*)0  // offset
+        );
+    }
+
+    if (vertexuv != -1) {
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.glbufs.uvs_buffer);
+        glBufferData(GL_ARRAY_BUFFER, mesh.uvs.size() * sizeof(GLfloat), &mesh.uvs[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(
+            vertexuv,
+            2,        // vec2
+            GL_FLOAT, // type
+            GL_FALSE, // normalized?
+            0,        // stride
+            (void*)0  // offset
+        );
+    }
+
+    if (vertexnormal != -1) {
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.glbufs.normals_buffer);
+        glBufferData(GL_ARRAY_BUFFER, mesh.normals.size() * sizeof(GLfloat), &mesh.normals[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(
+            vertexnormal,
+            3,        // vec3
+            GL_FLOAT, // type
+            GL_FALSE, // normalized?
+            0,        // stride
+            (void*)0  // offset
+        );
+    }
+
+    if (vertexcolor != -1) {
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.glbufs.colors_buffer);
+        glBufferData(GL_ARRAY_BUFFER, mesh.colors.size() * sizeof(GLfloat), &mesh.colors[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(
+            vertexcolor,
+            3,        // vec3
+            GL_FLOAT, // type
+            GL_FALSE, // normalized?
+            0,        // stride
+            (void*)0  // offset
+        );
+    }
+
+    if (mesh.indices.size()) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.glbufs.indices_buffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(GLuint), &mesh.indices[0], GL_STATIC_DRAW);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}

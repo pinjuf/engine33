@@ -39,7 +39,7 @@ int main() {
     window = glfwCreateWindow(WIDTH, HEIGHT, "engine33", NULL, NULL);
 
     // Hacky hack because GLFW_FLOATING doesn't work apparently
-    system("/bin/i3-msg floating enable");
+    //system("/bin/i3-msg floating enable");
 
     if (!window) {
         std::cerr << "Failed to create window" << std::endl;
@@ -72,7 +72,8 @@ int main() {
     );
 
     Mesh my_mesh;
-    my_mesh.load_wfobj("../models/monke.obj");
+    my_mesh.load_wfobj("../models/kaczd20.obj");
+    shadermanager.update_mesh_bufs(my_shader, my_mesh);
 
     int texw, texh, nchans;
     unsigned char * my_texture_data = stbi_load("../textures/kaczd20.png", &texw, &texh, &nchans, 0);
@@ -85,56 +86,11 @@ int main() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texw, texh, 0, GL_RGB, GL_UNSIGNED_BYTE, my_texture_data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    GLuint vertexbuffer;
-    glGenBuffers(1, &vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, my_mesh.vertices.size() * 4, &my_mesh.vertices[0], GL_STATIC_DRAW);
-
-    GLuint uvbuffer;
-    glGenBuffers(1, &uvbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, my_mesh.uvs.size() * 4, &my_mesh.uvs[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    GLuint indexbuffer;
-    glGenBuffers(1, &indexbuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, my_mesh.indices.size() * 4, &my_mesh.indices[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    GLuint vao;
-    glGenVertexArrays(1, &vao); // Create and use our VAO
-
     cam = Camera(glm::vec3(0.0f, 0.0f, -5.0f));
     glm::mat4 mvp;
 
-    GLint shader_vertex_pos = glGetAttribLocation(my_shader, "vertpos_model");
-    GLint shader_uv_pos = glGetAttribLocation(my_shader, "vertuv");
-
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glVertexAttribPointer(
-            shader_vertex_pos,
-            3,        // vec3
-            GL_FLOAT, // type
-            GL_FALSE, // normalized
-            0,        // stride
-            (void*)0  // offset in buffer
-    );
-
-    glBindBuffer(GL_ARRAY_BUFFER,uvbuffer);
-    glVertexAttribPointer(
-            shader_uv_pos,
-            2,        // vec2
-            GL_FLOAT, // type
-            GL_FALSE, // normalized
-            0,        // stride
-            (void*)0  // offset in buffer
-    );
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    GLint shader_vertex_pos = glGetAttribLocation(my_shader, "e33_vertexposition");
+    GLint shader_uv_pos = glGetAttribLocation(my_shader, "e33_vertexuv");
 
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
@@ -153,14 +109,15 @@ int main() {
 
         glUniformMatrix4fv(glGetUniformLocation(my_shader, "mvp"), 1, GL_FALSE, &mvp[0][0]);
 
-        glBindVertexArray(vao);
+        glBindVertexArray(my_mesh.vao);
 
         glEnableVertexAttribArray(shader_vertex_pos);
         glEnableVertexAttribArray(shader_uv_pos);
 
-        glBindTexture(GL_TEXTURE_2D, texture);;
+        glBindTexture(GL_TEXTURE_2D, texture);
         glActiveTexture(GL_TEXTURE0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_mesh.glbufs.indices_buffer);
         glDrawElements( // Draw!
                 GL_TRIANGLES,
                 my_mesh.indices.size(),

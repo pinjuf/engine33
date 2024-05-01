@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS =
+CXXFLAGS = -g
 LDFLAGS += $(shell pkg-config --libs glfw3)
 LDFLAGS += $(shell pkg-config --libs glew)
 MAKEFLAGS = -j$(shell nproc)

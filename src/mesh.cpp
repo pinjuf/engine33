@@ -1,8 +1,11 @@
 #include "mesh.h"
+#include "shader.h"
 
 #include <cstring>
 
-Mesh::Mesh() {}
+Mesh::Mesh() {
+    init_glbufs();
+}
 
 void Mesh::load_wfobj(const char * path) {
     // "Inspired" (copied) from https://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
@@ -62,7 +65,6 @@ void Mesh::load_wfobj(const char * path) {
 
         auto known = known_indices.find(index_group);
         if (known != known_indices.end()) {
-            std::cout << "Reusing IG " << known->first << std::endl;
             indices.push_back(known->second);
             continue;
         }
@@ -88,4 +90,9 @@ void Mesh::load_wfobj(const char * path) {
         normals.push_back(VN.y);
         normals.push_back(VN.z);
     }
+}
+
+void Mesh::init_glbufs() {
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(5, (GLuint*)&glbufs);
 }

@@ -11,6 +11,10 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+class Mesh;
+
+#include "mesh.h"
+
 GLuint loadShader(const char * vertp, const char * fragp);
 
 class ShaderManager {
@@ -24,4 +28,6 @@ class ShaderManager {
 
         // TODO: Geometry/tesselation/etc. shaders?
         GLuint link_program(GLuint vert, GLuint frag);
+
+        void update_mesh_bufs(GLuint shader, Mesh mesh);
 };
