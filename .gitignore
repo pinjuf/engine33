@@ -1,2 +1,4 @@
 *.o
 engine33
+
+*.mtl

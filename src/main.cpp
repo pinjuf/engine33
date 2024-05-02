@@ -72,11 +72,11 @@ int main() {
     );
 
     Mesh my_mesh;
-    my_mesh.load_wfobj("../models/kaczd20.obj");
+    my_mesh.load_wfobj("../models/f15.obj");
     shadermanager.update_mesh_bufs(my_shader, my_mesh);
 
     int texw, texh, nchans;
-    unsigned char * my_texture_data = stbi_load("../textures/kaczd20.png", &texw, &texh, &nchans, 0);
+    unsigned char * my_texture_data = stbi_load("../textures/f15.png", &texw, &texh, &nchans, 0);
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -95,12 +95,16 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
 
+    //glfwSwapInterval(0); // Disable VSync
+
     glfwSetTime(0);
     seconds = glfwGetTime();
 
     size_t i = 0;
 
     do {
+        my_mesh.orientation = glm::rotate(glm::mat4(1.0f), (float)sin(seconds * 1.5), RIGHT);
+        my_mesh.worldspace_pos.z = sin(seconds * 1.5);
         mvp = cam.vpmatrix() * my_mesh.model_matrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
@@ -141,8 +145,8 @@ int main() {
 
         i++;
         if (i % 240 == 0)
-            printf("FPS = %f\n", 1/deltaT);
-            //printf("FPS = %f\n", i/seconds); // For average
+            //printf("FPS = %f\n", 1/deltaT);
+            printf("FPS = %f\n", i/seconds); // For average
 
     } while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
              glfwWindowShouldClose(window) == 0);
