@@ -2,6 +2,8 @@
 
 #include "shader.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 class Mesh {
     public:
         Mesh();
@@ -13,6 +15,11 @@ class Mesh {
         std::vector<GLuint> indices;
 
         void load_wfobj(const char * path);
+
+        glm::vec3 worldspace_pos = {0, 0, 0};
+        glm::mat4 orientation = glm::mat4(1.0f);
+
+        glm::mat4 model_matrix();
 
         // GL buffers
         GLuint vao = UINT32_MAX;

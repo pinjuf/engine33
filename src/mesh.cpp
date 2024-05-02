@@ -96,3 +96,7 @@ void Mesh::init_glbufs() {
     glGenVertexArrays(1, &vao);
     glGenBuffers(5, (GLuint*)&glbufs);
 }
+
+glm::mat4 Mesh::model_matrix() {
+    return glm::translate(glm::mat4(1.0f), worldspace_pos) * orientation;
+}

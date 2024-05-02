@@ -17,5 +17,5 @@ void handle_mouse() {
     mouseypos = newypos;
 
     cam.chyaw_g(deltaxpos * (0.5f * (float)deltaT));
-    cam.chpitch(- deltaypos * (0.5f * (float)deltaT));
+    cam.chpitch(-deltaypos * (0.5f * (float)deltaT));
 }

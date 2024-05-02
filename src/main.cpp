@@ -101,7 +101,7 @@ int main() {
     size_t i = 0;
 
     do {
-        mvp = cam.vpmatrix();
+        mvp = cam.vpmatrix() * my_mesh.model_matrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
