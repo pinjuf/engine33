@@ -39,7 +39,7 @@ int main() {
     window = glfwCreateWindow(WIDTH, HEIGHT, "engine33", NULL, NULL);
 
     // Hacky hack because GLFW_FLOATING doesn't work apparently
-    //system("/bin/i3-msg floating enable");
+    system("/bin/i3-msg floating enable");
 
     if (!window) {
         std::cerr << "Failed to create window" << std::endl;

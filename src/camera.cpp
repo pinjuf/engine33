@@ -46,5 +46,10 @@ void Camera::chyaw_g(float delta) {
 }
 
 void Camera::chpitch(float delta) {
-    orientation = glm::rotate(glm::mat4(1.0f), delta, right()) * orientation;
+    glm::mat4 new_orientation = glm::rotate(glm::mat4(1.0f), delta, right()) * orientation;
+
+    if ((new_orientation * glm::vec4(UP, 0.0f)).y < 0)
+        return;
+
+    orientation = new_orientation;
 }
