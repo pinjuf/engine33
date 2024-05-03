@@ -93,7 +93,7 @@ int main() {
     GLint shader_uv_pos = glGetAttribLocation(my_shader, "e33_vertexuv");
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
     //glfwSwapInterval(0); // Disable VSync
 
@@ -102,9 +102,9 @@ int main() {
 
     size_t i = 0;
 
+
+
     do {
-        my_mesh.orientation = glm::rotate(glm::mat4(1.0f), (float)sin(seconds * 1.5), RIGHT);
-        my_mesh.worldspace_pos.z = sin(seconds * 1.5);
         mvp = cam.vpmatrix() * my_mesh.model_matrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
@@ -115,11 +115,11 @@ int main() {
 
         glBindVertexArray(my_mesh.vao);
 
-        glEnableVertexAttribArray(shader_vertex_pos);
-        glEnableVertexAttribArray(shader_uv_pos);
-
         glBindTexture(GL_TEXTURE_2D, texture);
         glActiveTexture(GL_TEXTURE0);
+
+        glEnableVertexAttribArray(shader_vertex_pos);
+        glEnableVertexAttribArray(shader_uv_pos);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_mesh.glbufs.indices_buffer);
         glDrawElements( // Draw!
