@@ -74,23 +74,18 @@ GLuint ShaderManager::link_program(GLuint vert, GLuint frag) {
     return id;
 }
 
-void ShaderManager::update_mesh_bufs(GLuint shader, Mesh mesh) {
+void ShaderProgram::update_mesh_bufs(Mesh mesh) {
     // Update the vertex attributes (the connection between the mesh's buffer and the shaders)
-
-    GLint vertexposition = glGetAttribLocation(shader, "e33_vertexposition");
-    GLint vertexuv       = glGetAttribLocation(shader, "e33_vertexuv");
-    GLint vertexnormal   = glGetAttribLocation(shader, "e33_vertexnormal");
-    GLint vertexcolor    = glGetAttribLocation(shader, "e33_vertexcolor");
 
     glBindVertexArray(mesh.vao);
 
     // TODO: this is ugly
-    if (vertexposition != -1) {
+    if (vertex_attributes.position != -1) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh.glbufs.vertices_buffer);
         glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(GLfloat), &mesh.vertices[0], GL_STATIC_DRAW);
 
         glVertexAttribPointer(
-            vertexposition,
+            vertex_attributes.position,
             3,        // vec3
             GL_FLOAT, // type
             GL_FALSE, // normalized?
@@ -99,12 +94,12 @@ void ShaderManager::update_mesh_bufs(GLuint shader, Mesh mesh) {
         );
     }
 
-    if (vertexuv != -1) {
+    if (vertex_attributes.uv != -1) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh.glbufs.uvs_buffer);
         glBufferData(GL_ARRAY_BUFFER, mesh.uvs.size() * sizeof(GLfloat), &mesh.uvs[0], GL_STATIC_DRAW);
 
         glVertexAttribPointer(
-            vertexuv,
+            vertex_attributes.uv,
             2,        // vec2
             GL_FLOAT, // type
             GL_FALSE, // normalized?
@@ -113,12 +108,12 @@ void ShaderManager::update_mesh_bufs(GLuint shader, Mesh mesh) {
         );
     }
 
-    if (vertexnormal != -1) {
+    if (vertex_attributes.normal != -1) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh.glbufs.normals_buffer);
         glBufferData(GL_ARRAY_BUFFER, mesh.normals.size() * sizeof(GLfloat), &mesh.normals[0], GL_STATIC_DRAW);
 
         glVertexAttribPointer(
-            vertexnormal,
+            vertex_attributes.normal,
             3,        // vec3
             GL_FLOAT, // type
             GL_FALSE, // normalized?
@@ -127,12 +122,12 @@ void ShaderManager::update_mesh_bufs(GLuint shader, Mesh mesh) {
         );
     }
 
-    if (vertexcolor != -1) {
+    if (vertex_attributes.color != -1) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh.glbufs.colors_buffer);
         glBufferData(GL_ARRAY_BUFFER, mesh.colors.size() * sizeof(GLfloat), &mesh.colors[0], GL_STATIC_DRAW);
 
         glVertexAttribPointer(
-            vertexcolor,
+            vertex_attributes.color,
             3,        // vec3
             GL_FLOAT, // type
             GL_FALSE, // normalized?
@@ -149,4 +144,18 @@ void ShaderManager::update_mesh_bufs(GLuint shader, Mesh mesh) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+}
+
+ShaderProgram::ShaderProgram(GLuint id) {
+    this->id = id;
+
+    vertex_attributes.position = glGetAttribLocation(id, "e33_vertexposition");
+    vertex_attributes.uv       = glGetAttribLocation(id, "e33_vertexuv");
+    vertex_attributes.normal   = glGetAttribLocation(id, "e33_vertexnormal");
+    vertex_attributes.color    = glGetAttribLocation(id, "e33_vertexcolor");
+
+    uniforms.mvp              = glGetUniformLocation(id, "e33_mvp");
+    uniforms.modelmatrix      = glGetUniformLocation(id, "e33_modelmatrix");
+    uniforms.cameramatrix     = glGetUniformLocation(id, "e33_cameramatrix");
+    uniforms.projectionmatrix = glGetUniformLocation(id, "e33_projectionmatrix");
 }

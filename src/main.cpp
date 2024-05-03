@@ -66,14 +66,16 @@ int main() {
     glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
 
     shadermanager = ShaderManager();
-    GLuint my_shader = shadermanager.link_program(
+    GLuint my_shader_id = shadermanager.link_program(
         shadermanager.load_shader(GL_VERTEX_SHADER, "../shaders/mvp_uv.vert"),
         shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/texture.frag")
     );
 
+    ShaderProgram my_shader(my_shader_id);
+
     Mesh my_mesh;
     my_mesh.load_wfobj("../models/f15.obj");
-    shadermanager.update_mesh_bufs(my_shader, my_mesh);
+    my_shader.update_mesh_bufs(my_mesh);
 
     int texw, texh, nchans;
     unsigned char * my_texture_data = stbi_load("../textures/f15.png", &texw, &texh, &nchans, 0);
@@ -88,9 +90,6 @@ int main() {
 
     cam = Camera(glm::vec3(0.0f, 0.0f, -5.0f));
     glm::mat4 mvp;
-
-    GLint shader_vertex_pos = glGetAttribLocation(my_shader, "e33_vertexposition");
-    GLint shader_uv_pos = glGetAttribLocation(my_shader, "e33_vertexuv");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -109,17 +108,17 @@ int main() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
-        glUseProgram(my_shader);
+        glUseProgram(my_shader.id);
 
-        glUniformMatrix4fv(glGetUniformLocation(my_shader, "mvp"), 1, GL_FALSE, &mvp[0][0]);
+        glUniformMatrix4fv(my_shader.uniforms.mvp, 1, GL_FALSE, &mvp[0][0]);
 
         glBindVertexArray(my_mesh.vao);
 
         glBindTexture(GL_TEXTURE_2D, texture);
         glActiveTexture(GL_TEXTURE0);
 
-        glEnableVertexAttribArray(shader_vertex_pos);
-        glEnableVertexAttribArray(shader_uv_pos);
+        glEnableVertexAttribArray(my_shader.vertex_attributes.position);
+        glEnableVertexAttribArray(my_shader.vertex_attributes.uv);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_mesh.glbufs.indices_buffer);
         glDrawElements( // Draw!
@@ -129,8 +128,8 @@ int main() {
                 (void*)0
         );
 
-        glDisableVertexAttribArray(shader_vertex_pos);
-        glDisableVertexAttribArray(shader_uv_pos);
+        glDisableVertexAttribArray(my_shader.vertex_attributes.position);
+        glDisableVertexAttribArray(my_shader.vertex_attributes.uv);
 
         glBindVertexArray(0);
 

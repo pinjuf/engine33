@@ -23,3 +23,7 @@ Wish me luck, I'm gonna be using https://www.opengl-tutorial.org 's beginner tut
 - (u) mat4 e33_cameramatrix     : World space -> Camera Space transformation matrix
 - (u) mat4 e33_projectionmatrix : Camera Space -> Projection Space transformation matrix
 - (u) sampler2D e33_texture0-15 : Texture #0-15
+
+    OTHER STUFF
+
+If I copy"right" infringed on some textures, tell me, I'll take them down.

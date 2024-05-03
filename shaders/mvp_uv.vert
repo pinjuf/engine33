@@ -7,10 +7,10 @@ in vec2 e33_vertexuv;
 
 out vec2 uv;
 
-uniform mat4 mvp;
+uniform mat4 e33_mvp;
 
 void main() {
-    gl_Position = mvp * vec4(e33_vertexposition, 1.0f);
+    gl_Position = e33_mvp * vec4(e33_vertexposition, 1.0f);
 
     uv = e33_vertexuv;
 }
