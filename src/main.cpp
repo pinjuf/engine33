@@ -66,25 +66,41 @@ int main() {
     glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
 
     shadermanager = ShaderManager();
-    GLuint my_shader_id = shadermanager.link_program(
+
+    ShaderProgram plane_shader(shadermanager.link_program(
         shadermanager.load_shader(GL_VERTEX_SHADER, "../shaders/mvp_uv.vert"),
         shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/texture.frag")
-    );
+    ));
 
-    ShaderProgram my_shader(my_shader_id);
+    ShaderProgram terrain_shader(shadermanager.link_program(
+        shadermanager.load_shader(GL_VERTEX_SHADER, "../shaders/mvp_uv.vert"),
+        shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/texture.frag")
+    ));
 
-    Mesh my_mesh;
-    my_mesh.load_wfobj("../models/f15.obj");
-    my_mesh.update_mesh_bufs(my_shader);
+    Mesh plane;
+    plane.load_wfobj("../models/f15.obj");
+    plane.update_mesh_bufs(plane_shader);
+
+    Mesh terrain;
+    terrain.load_wfobj("../models/terrain.obj");
+    terrain.update_mesh_bufs(terrain_shader);
 
     int texw, texh, nchans;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char * my_texture_data = stbi_load("../textures/f15.png", &texw, &texh, &nchans, 0);
+    unsigned char * plane_texture_data = stbi_load("../textures/f15.png", &texw, &texh, &nchans, 3);
 
-    glBindTexture(GL_TEXTURE_2D, my_mesh.textures[0]);
+    glBindTexture(GL_TEXTURE_2D, plane.textures[0]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texw, texh, 0, GL_RGB, GL_UNSIGNED_BYTE, my_texture_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texw, texh, 0, GL_RGB, GL_UNSIGNED_BYTE, plane_texture_data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    unsigned char * terrain_texture_data = stbi_load("../textures/ground.png", &texw, &texh, &nchans, 3);
+
+    glBindTexture(GL_TEXTURE_2D, terrain.textures[0]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texw, texh, 0, GL_RGB, GL_UNSIGNED_BYTE, terrain_texture_data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     cam = Camera(glm::vec3(0.0f, 0.0f, -5.0f));
@@ -101,7 +117,10 @@ int main() {
     do {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
-        my_mesh.render(my_shader);
+        plane.orientation = glm::rotate(glm::mat4(1.0f), 0.1f * (float)deltaT, FORWARD) * plane.orientation;
+
+        plane.render(plane_shader);
+        terrain.render(terrain_shader);
 
         glfwSwapBuffers(window);
 

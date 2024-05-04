@@ -19,8 +19,8 @@ glm::mat4 Camera::projectionmatrix() {
     return glm::perspective(
             glm::radians(fov),
             (float)WIDTH/HEIGHT,
-            0.01f,
-            100.f
+            0.01f, // Near limit
+            1000.f  // Far limit
     );
 }
 
