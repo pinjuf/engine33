@@ -1,5 +1,6 @@
 #include "mesh.h"
 #include "shader.h"
+#include "main.h"
 
 #include <cstring>
 
@@ -173,3 +174,52 @@ void Mesh::update_mesh_bufs(ShaderProgram shader) {
     glBindVertexArray(0);
 }
 
+void Mesh::render(ShaderProgram shader) {
+    // Guess what this does!
+
+    glm::mat4 m = model_matrix();
+    glm::mat4 v = cam.viewmatrix();
+    glm::mat4 p = cam.projectionmatrix();
+    glm::mat4 mvp = p * v * m;
+
+    glBindVertexArray(vao);
+    glUseProgram(shader.id);
+
+    if (shader.uniforms.modelmatrix != -1)
+        glUniformMatrix4fv(shader.uniforms.modelmatrix, 1, GL_FALSE, &m[0][0]);
+    if (shader.uniforms.cameramatrix != -1)
+        glUniformMatrix4fv(shader.uniforms.cameramatrix, 1, GL_FALSE, &v[0][0]);
+    if (shader.uniforms.projectionmatrix != -1)
+        glUniformMatrix4fv(shader.uniforms.projectionmatrix, 1, GL_FALSE, &p[0][0]);
+    if (shader.uniforms.mvp != -1)
+        glUniformMatrix4fv(shader.uniforms.mvp, 1, GL_FALSE, &mvp[0][0]);
+
+    if (shader.vertex_attributes.position != -1)
+        glEnableVertexAttribArray(shader.vertex_attributes.position);
+    if (shader.vertex_attributes.uv != -1)
+        glEnableVertexAttribArray(shader.vertex_attributes.uv);
+    if (shader.vertex_attributes.normal != -1)
+        glEnableVertexAttribArray(shader.vertex_attributes.normal);
+    if (shader.vertex_attributes.color != -1)
+        glEnableVertexAttribArray(shader.vertex_attributes.color);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glbufs.indices_buffer);
+    glDrawElements(
+        GL_TRIANGLES,
+        indices.size(),
+        GL_UNSIGNED_INT,
+        (void*)0
+    );
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    if (shader.vertex_attributes.position != -1)
+        glDisableVertexAttribArray(shader.vertex_attributes.position);
+    if (shader.vertex_attributes.uv != -1)
+        glDisableVertexAttribArray(shader.vertex_attributes.uv);
+    if (shader.vertex_attributes.normal != -1)
+        glDisableVertexAttribArray(shader.vertex_attributes.normal);
+    if (shader.vertex_attributes.color != -1)
+        glDisableVertexAttribArray(shader.vertex_attributes.color);
+
+    glBindVertexArray(0);
+}

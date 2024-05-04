@@ -35,4 +35,6 @@ class Mesh {
 
         void init_glbufs();
         void update_mesh_bufs(ShaderProgram shader);
+
+        void render(ShaderProgram shader);
 };

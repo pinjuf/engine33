@@ -89,7 +89,6 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     cam = Camera(glm::vec3(0.0f, 0.0f, -5.0f));
-    glm::mat4 mvp;
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -100,38 +99,13 @@ int main() {
     seconds = glfwGetTime();
 
     size_t i = 0;
-
-
-
     do {
-        mvp = cam.vpmatrix() * my_mesh.model_matrix();
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
-
-        glUseProgram(my_shader.id);
-
-        glUniformMatrix4fv(my_shader.uniforms.mvp, 1, GL_FALSE, &mvp[0][0]);
-
-        glBindVertexArray(my_mesh.vao);
 
         glBindTexture(GL_TEXTURE_2D, texture);
         glActiveTexture(GL_TEXTURE0);
 
-        glEnableVertexAttribArray(my_shader.vertex_attributes.position);
-        glEnableVertexAttribArray(my_shader.vertex_attributes.uv);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_mesh.glbufs.indices_buffer);
-        glDrawElements( // Draw!
-                GL_TRIANGLES,
-                my_mesh.indices.size(),
-                GL_UNSIGNED_INT,
-                (void*)0
-        );
-
-        glDisableVertexAttribArray(my_shader.vertex_attributes.position);
-        glDisableVertexAttribArray(my_shader.vertex_attributes.uv);
-
-        glBindVertexArray(0);
+        my_mesh.render(my_shader);
 
         glfwSwapBuffers(window);
 
