@@ -36,8 +36,6 @@ class ShaderProgram {
             GLint cameramatrix;
             GLint projectionmatrix;
         } uniforms;
-
-        void update_mesh_bufs(Mesh mesh);
 };
 
 class ShaderManager {

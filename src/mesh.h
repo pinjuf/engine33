@@ -1,5 +1,7 @@
 #pragma once
 
+class ShaderProgram;
+
 #include "shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -32,4 +34,5 @@ class Mesh {
         } glbufs;
 
         void init_glbufs();
+        void update_mesh_bufs(ShaderProgram shader);
 };

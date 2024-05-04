@@ -75,7 +75,7 @@ int main() {
 
     Mesh my_mesh;
     my_mesh.load_wfobj("../models/f15.obj");
-    my_shader.update_mesh_bufs(my_mesh);
+    my_mesh.update_mesh_bufs(my_shader);
 
     int texw, texh, nchans;
     unsigned char * my_texture_data = stbi_load("../textures/f15.png", &texw, &texh, &nchans, 0);

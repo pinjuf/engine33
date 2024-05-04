@@ -100,3 +100,76 @@ void Mesh::init_glbufs() {
 glm::mat4 Mesh::model_matrix() {
     return glm::translate(glm::mat4(1.0f), worldspace_pos) * orientation;
 }
+
+void Mesh::update_mesh_bufs(ShaderProgram shader) {
+    // Update the vertex attributes (the connection between the mesh's buffer and the shaders)
+
+    glBindVertexArray(vao);
+
+    // TODO: this is ugly
+    if (shader.vertex_attributes.position != -1) {
+        glBindBuffer(GL_ARRAY_BUFFER, glbufs.vertices_buffer);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(
+            shader.vertex_attributes.position,
+            3,        // vec3
+            GL_FLOAT, // type
+            GL_FALSE, // normalized?
+            0,        // stride
+            (void*)0  // offset
+        );
+    }
+
+    if (shader.vertex_attributes.uv != -1) {
+        glBindBuffer(GL_ARRAY_BUFFER, glbufs.uvs_buffer);
+        glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(GLfloat), &uvs[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(
+            shader.vertex_attributes.uv,
+            2,        // vec2
+            GL_FLOAT, // type
+            GL_FALSE, // normalized?
+            0,        // stride
+            (void*)0  // offset
+        );
+    }
+
+    if (shader.vertex_attributes.normal != -1) {
+        glBindBuffer(GL_ARRAY_BUFFER, glbufs.normals_buffer);
+        glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(GLfloat), &normals[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(
+            shader.vertex_attributes.normal,
+            3,        // vec3
+            GL_FLOAT, // type
+            GL_FALSE, // normalized?
+            0,        // stride
+            (void*)0  // offset
+        );
+    }
+
+    if (shader.vertex_attributes.color != -1) {
+        glBindBuffer(GL_ARRAY_BUFFER, glbufs.colors_buffer);
+        glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(GLfloat), &colors[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(
+            shader.vertex_attributes.color,
+            3,        // vec3
+            GL_FLOAT, // type
+            GL_FALSE, // normalized?
+            0,        // stride
+            (void*)0  // offset
+        );
+    }
+
+    if (indices.size()) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glbufs.indices_buffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
