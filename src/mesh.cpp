@@ -43,7 +43,6 @@ void Mesh::load_wfobj(const char * path) {
         } else if (!strcmp(token, "vt")) { // UVs
             glm::vec2 texcoord;
             fscanf(file, "%f %f\n", &texcoord.x, &texcoord.y);
-            texcoord.y *= -1;
             vt.push_back(texcoord);
         } else if (!strcmp(token, "vn")) { // Normals
             glm::vec3 normal;

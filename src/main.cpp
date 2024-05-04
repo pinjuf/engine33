@@ -78,6 +78,7 @@ int main() {
     my_mesh.update_mesh_bufs(my_shader);
 
     int texw, texh, nchans;
+    stbi_set_flip_vertically_on_load(true);
     unsigned char * my_texture_data = stbi_load("../textures/f15.png", &texw, &texh, &nchans, 0);
 
     GLuint texture;
@@ -102,8 +103,8 @@ int main() {
     do {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
-        glBindTexture(GL_TEXTURE_2D, texture);
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
 
         my_mesh.render(my_shader);
 
