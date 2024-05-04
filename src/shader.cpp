@@ -86,4 +86,8 @@ ShaderProgram::ShaderProgram(GLuint id) {
     uniforms.modelmatrix      = glGetUniformLocation(id, "e33_modelmatrix");
     uniforms.cameramatrix     = glGetUniformLocation(id, "e33_cameramatrix");
     uniforms.projectionmatrix = glGetUniformLocation(id, "e33_projectionmatrix");
+
+    for (uint8_t i = 0; i < 16; i++) {
+        uniforms.textures[i] = glGetUniformLocation(id, ("e33_texture" + std::to_string(i)).c_str());
+    }
 }

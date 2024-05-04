@@ -33,6 +33,8 @@ class Mesh {
             GLuint indices_buffer  = UINT32_MAX;
         } glbufs;
 
+        GLuint textures[16] = {UINT32_MAX};
+
         void init_glbufs();
         void update_mesh_bufs(ShaderProgram shader);
 

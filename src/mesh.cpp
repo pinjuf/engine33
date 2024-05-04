@@ -95,6 +95,8 @@ void Mesh::load_wfobj(const char * path) {
 void Mesh::init_glbufs() {
     glGenVertexArrays(1, &vao);
     glGenBuffers(5, (GLuint*)&glbufs);
+
+    glGenTextures(16, textures);
 }
 
 glm::mat4 Mesh::model_matrix() {
@@ -201,6 +203,13 @@ void Mesh::render(ShaderProgram shader) {
         glEnableVertexAttribArray(shader.vertex_attributes.normal);
     if (shader.vertex_attributes.color != -1)
         glEnableVertexAttribArray(shader.vertex_attributes.color);
+
+    for (uint8_t i = 0; i < 16; i++) {
+        glUniform1i(shader.uniforms.textures[i], i); // Bind the location of the sampler to the texture units (0 - 15)
+
+        glActiveTexture(GL_TEXTURE0 + i); // Now, connect texture unit #i to our texture #i
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+    }
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glbufs.indices_buffer);
     glDrawElements(

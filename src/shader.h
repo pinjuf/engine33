@@ -35,6 +35,8 @@ class ShaderProgram {
             GLint modelmatrix;
             GLint cameramatrix;
             GLint projectionmatrix;
+
+            GLint textures[16];
         } uniforms;
 };
 
