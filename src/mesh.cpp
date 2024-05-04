@@ -4,9 +4,7 @@
 
 #include <cstring>
 
-Mesh::Mesh() {
-    init_glbufs();
-}
+Mesh::Mesh() {}
 
 void Mesh::load_wfobj(const char * path) {
     // "Inspired" (copied) from https://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/

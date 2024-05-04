@@ -26,6 +26,8 @@ Camera cam;
 double seconds;
 double deltaT;
 
+Mesh plane;
+
 int main() {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -36,7 +38,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // OpenGL 4.6
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "engine33", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "engine33", glfwGetPrimaryMonitor(), NULL);
 
     // Hacky hack because GLFW_FLOATING doesn't work apparently
     system("/bin/i3-msg floating enable");
@@ -77,11 +79,12 @@ int main() {
         shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/texture.frag")
     ));
 
-    Mesh plane;
+    plane.init_glbufs();
     plane.load_wfobj("../models/f15.obj");
     plane.update_mesh_bufs(plane_shader);
 
     Mesh terrain;
+    terrain.init_glbufs();
     terrain.load_wfobj("../models/terrain.obj");
     terrain.update_mesh_bufs(terrain_shader);
 
@@ -117,8 +120,6 @@ int main() {
     do {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
-        plane.orientation = glm::rotate(glm::mat4(1.0f), 0.1f * (float)deltaT, FORWARD) * plane.orientation;
-
         plane.render(plane_shader);
         terrain.render(terrain_shader);
 
@@ -127,6 +128,8 @@ int main() {
         double new_seconds = glfwGetTime();
         deltaT = new_seconds - seconds;
         seconds = new_seconds;
+
+        glfwPollEvents();
 
         handle_keyboard();
         handle_mouse();

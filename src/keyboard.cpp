@@ -1,13 +1,20 @@
 #include "keyboard.h"
 #include "main.h"
 
-void handle_keyboard() {
-    glfwPollEvents();
+#include "mouse.h"
 
-    if (glfwGetKey(window, GLFW_KEY_W)) cam.position += cam.forward() * (50.0f * (float)deltaT);
-    if (glfwGetKey(window, GLFW_KEY_S)) cam.position -= cam.forward() * (50.0f * (float)deltaT);
-    if (glfwGetKey(window, GLFW_KEY_A)) cam.position -= cam.right() * (50.0f * (float)deltaT);
-    if (glfwGetKey(window, GLFW_KEY_D)) cam.position += cam.right() * (50.0f * (float)deltaT);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) cam.position += UP * (50.0f * (float)deltaT);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL)) cam.position -= UP * (50.0f * (float)deltaT);
+void handle_keyboard() {
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        plane_speed += 20 * deltaT;
+        cam.fov += deltaT * 5;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        plane_speed -= 20 * deltaT;
+        cam.fov -= deltaT * 5;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        plane.orientation = glm::rotate(glm::mat4(1.0f), float(1 * deltaT), glm::vec3(plane.orientation * glm::vec4(UP, 0.0f))) * plane.orientation;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        plane.orientation = glm::rotate(glm::mat4(1.0f), float(-1 * deltaT), glm::vec3(plane.orientation * glm::vec4(UP, 0.0f))) * plane.orientation;
 }
