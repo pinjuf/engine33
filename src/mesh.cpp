@@ -203,6 +203,9 @@ void Mesh::render(ShaderProgram shader) {
         glEnableVertexAttribArray(shader.vertex_attributes.color);
 
     for (uint8_t i = 0; i < 16; i++) {
+        if (shader.uniforms.textures[i] == -1)
+            continue;
+
         glUniform1i(shader.uniforms.textures[i], i); // Bind the location of the sampler to the texture units (0 - 15)
 
         glActiveTexture(GL_TEXTURE0 + i); // Now, connect texture unit #i to our texture #i
