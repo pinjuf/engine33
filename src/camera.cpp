@@ -10,8 +10,8 @@ Camera::Camera(glm::vec3 position) {
 glm::mat4 Camera::viewmatrix() {
     return glm::lookAt(
             position,
-            position + glm::vec3(orientation * glm::vec4(FORWARD, 1.0f)),
-            glm::vec3(orientation * glm::vec4(UP, 1.0f))
+            position + glm::vec3(orientation * glm::vec4(FORWARD, 0.0f)),
+            glm::vec3(orientation * glm::vec4(UP, 0.0f))
     );
 }
 
