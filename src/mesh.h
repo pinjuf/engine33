@@ -3,6 +3,7 @@
 class ShaderProgram;
 
 #include "shader.h"
+#include "space.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -18,8 +19,7 @@ class Mesh {
 
         void load_wfobj(const char * path);
 
-        glm::vec3 position = {0, 0, 0};
-        glm::mat4 orientation = glm::mat4(1.0f);
+        Placement p;
 
         glm::mat4 model_matrix();
 

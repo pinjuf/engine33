@@ -106,7 +106,9 @@ int main() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texw, texh, 0, GL_RGB, GL_UNSIGNED_BYTE, terrain_texture_data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    cam = Camera(glm::vec3(0.0f, 0.0f, -5.0f));
+    cam = Camera();
+    cam.p.position = BACKWARD * 3.0f + UP * 1.0f;
+    cam.p.parent = &plane.p;
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);

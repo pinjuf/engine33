@@ -1,10 +1,10 @@
 CXX = g++
-CXXFLAGS = -g
+CXXFLAGS = -g -O3 -mavx -mavx2
 LDFLAGS += $(shell pkg-config --libs glfw3)
 LDFLAGS += $(shell pkg-config --libs glew)
 MAKEFLAGS = -j$(shell nproc)
 
-OBJS = main.o shader.o camera.o keyboard.o mouse.o mesh.o
+OBJS = main.o shader.o camera.o keyboard.o mouse.o mesh.o space.o
 TARGET = engine33
 
 $(TARGET): $(OBJS)
