@@ -98,7 +98,7 @@ void Mesh::init_glbufs() {
 }
 
 glm::mat4 Mesh::model_matrix() {
-    return glm::translate(glm::mat4(1.0f), worldspace_pos) * orientation;
+    return glm::translate(glm::mat4(1.0f), position) * orientation;
 }
 
 void Mesh::update_mesh_bufs(ShaderProgram shader) {

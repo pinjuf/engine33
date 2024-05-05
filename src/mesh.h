@@ -18,7 +18,7 @@ class Mesh {
 
         void load_wfobj(const char * path);
 
-        glm::vec3 worldspace_pos = {0, 0, 0};
+        glm::vec3 position = {0, 0, 0};
         glm::mat4 orientation = glm::mat4(1.0f);
 
         glm::mat4 model_matrix();
