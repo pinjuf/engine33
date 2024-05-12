@@ -4,6 +4,9 @@
 
 #include <cstring>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 Mesh::Mesh() {}
 
 void Mesh::load_wfobj(const char * path) {
@@ -231,4 +234,22 @@ void Mesh::render(ShaderProgram shader) {
         glDisableVertexAttribArray(shader.vertex_attributes.color);
 
     glBindVertexArray(0);
+}
+
+void Mesh::load_texture(uint8_t tex_index, const char * path) {
+    int w, h, nchans;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char * data = stbi_load(path, &w, &h, &nchans, 3);
+    if (nchans != 3) {
+        std::cerr << "Only RGB supported!" << std::endl;
+        return;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[tex_index]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    stbi_image_free(data);
 }

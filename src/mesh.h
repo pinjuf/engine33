@@ -39,4 +39,6 @@ class Mesh {
         void update_mesh_bufs(ShaderProgram shader);
 
         void render(ShaderProgram shader);
+
+        void load_texture(uint8_t tex_index, const char * path);
 };

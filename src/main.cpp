@@ -15,9 +15,6 @@
 #include "mouse.h"
 #include "mesh.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 GLFWwindow * window;
 
 ShaderManager shadermanager;
@@ -88,23 +85,8 @@ int main() {
     terrain.load_wfobj("../models/terrain.obj");
     terrain.update_mesh_bufs(terrain_shader);
 
-    int texw, texh, nchans;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char * plane_texture_data = stbi_load("../textures/f15.png", &texw, &texh, &nchans, 3);
-
-    glBindTexture(GL_TEXTURE_2D, plane.textures[0]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texw, texh, 0, GL_RGB, GL_UNSIGNED_BYTE, plane_texture_data);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    unsigned char * terrain_texture_data = stbi_load("../textures/ground.png", &texw, &texh, &nchans, 3);
-
-    glBindTexture(GL_TEXTURE_2D, terrain.textures[0]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texw, texh, 0, GL_RGB, GL_UNSIGNED_BYTE, terrain_texture_data);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    plane.load_texture(0, "../textures/f15.png");
+    terrain.load_texture(0, "../textures/ground.png");
 
     cam = Camera();
     cam.p.position = BACKWARD * 3.0f + UP * 1.0f;
