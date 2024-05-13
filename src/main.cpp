@@ -77,13 +77,15 @@ int main() {
     ));
 
     plane.init_glbufs();
+    plane.shader = &plane_shader;
     plane.load_wfobj("../models/f15.obj");
-    plane.update_mesh_bufs(plane_shader);
+    plane.update_mesh_bufs();
 
     Mesh terrain;
     terrain.init_glbufs();
+    terrain.shader = &terrain_shader;
     terrain.load_wfobj("../models/terrain.obj");
-    terrain.update_mesh_bufs(terrain_shader);
+    terrain.update_mesh_bufs();
 
     plane.load_texture(0, "../textures/f15.png");
     terrain.load_texture(0, "../textures/ground.png");
@@ -104,8 +106,8 @@ int main() {
     do {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
-        plane.render(plane_shader);
-        terrain.render(terrain_shader);
+        plane.render();
+        terrain.render();
 
         glfwSwapBuffers(window);
 

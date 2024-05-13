@@ -35,10 +35,12 @@ class Mesh {
 
         GLuint textures[16] = {UINT32_MAX};
 
-        void init_glbufs();
-        void update_mesh_bufs(ShaderProgram shader);
+        ShaderProgram * shader;
 
-        void render(ShaderProgram shader);
+        void init_glbufs();
+        void update_mesh_bufs();
+
+        void render();
 
         void load_texture(uint8_t tex_index, const char * path);
 };

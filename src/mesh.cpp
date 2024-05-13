@@ -104,18 +104,18 @@ glm::mat4 Mesh::model_matrix() {
     return p.matrix();
 }
 
-void Mesh::update_mesh_bufs(ShaderProgram shader) {
+void Mesh::update_mesh_bufs() {
     // Update the vertex attributes (the connection between the mesh's buffer and the shaders)
 
     glBindVertexArray(vao);
 
     // TODO: this is ugly
-    if (shader.vertex_attributes.position != -1) {
+    if (shader->vertex_attributes.position != -1) {
         glBindBuffer(GL_ARRAY_BUFFER, glbufs.vertices_buffer);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
 
         glVertexAttribPointer(
-            shader.vertex_attributes.position,
+            shader->vertex_attributes.position,
             3,        // vec3
             GL_FLOAT, // type
             GL_FALSE, // normalized?
@@ -124,12 +124,12 @@ void Mesh::update_mesh_bufs(ShaderProgram shader) {
         );
     }
 
-    if (shader.vertex_attributes.uv != -1) {
+    if (shader->vertex_attributes.uv != -1) {
         glBindBuffer(GL_ARRAY_BUFFER, glbufs.uvs_buffer);
         glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(GLfloat), &uvs[0], GL_STATIC_DRAW);
 
         glVertexAttribPointer(
-            shader.vertex_attributes.uv,
+            shader->vertex_attributes.uv,
             2,        // vec2
             GL_FLOAT, // type
             GL_FALSE, // normalized?
@@ -138,12 +138,12 @@ void Mesh::update_mesh_bufs(ShaderProgram shader) {
         );
     }
 
-    if (shader.vertex_attributes.normal != -1) {
+    if (shader->vertex_attributes.normal != -1) {
         glBindBuffer(GL_ARRAY_BUFFER, glbufs.normals_buffer);
         glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(GLfloat), &normals[0], GL_STATIC_DRAW);
 
         glVertexAttribPointer(
-            shader.vertex_attributes.normal,
+            shader->vertex_attributes.normal,
             3,        // vec3
             GL_FLOAT, // type
             GL_FALSE, // normalized?
@@ -152,12 +152,12 @@ void Mesh::update_mesh_bufs(ShaderProgram shader) {
         );
     }
 
-    if (shader.vertex_attributes.color != -1) {
+    if (shader->vertex_attributes.color != -1) {
         glBindBuffer(GL_ARRAY_BUFFER, glbufs.colors_buffer);
         glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(GLfloat), &colors[0], GL_STATIC_DRAW);
 
         glVertexAttribPointer(
-            shader.vertex_attributes.color,
+            shader->vertex_attributes.color,
             3,        // vec3
             GL_FLOAT, // type
             GL_FALSE, // normalized?
@@ -176,7 +176,7 @@ void Mesh::update_mesh_bufs(ShaderProgram shader) {
     glBindVertexArray(0);
 }
 
-void Mesh::render(ShaderProgram shader) {
+void Mesh::render() {
     // Guess what this does!
 
     glm::mat4 m = model_matrix();
@@ -185,31 +185,31 @@ void Mesh::render(ShaderProgram shader) {
     glm::mat4 mvp = p * v * m;
 
     glBindVertexArray(vao);
-    glUseProgram(shader.id);
+    glUseProgram(shader->id);
 
-    if (shader.uniforms.modelmatrix != -1)
-        glUniformMatrix4fv(shader.uniforms.modelmatrix, 1, GL_FALSE, &m[0][0]);
-    if (shader.uniforms.cameramatrix != -1)
-        glUniformMatrix4fv(shader.uniforms.cameramatrix, 1, GL_FALSE, &v[0][0]);
-    if (shader.uniforms.projectionmatrix != -1)
-        glUniformMatrix4fv(shader.uniforms.projectionmatrix, 1, GL_FALSE, &p[0][0]);
-    if (shader.uniforms.mvp != -1)
-        glUniformMatrix4fv(shader.uniforms.mvp, 1, GL_FALSE, &mvp[0][0]);
+    if (shader->uniforms.modelmatrix != -1)
+        glUniformMatrix4fv(shader->uniforms.modelmatrix, 1, GL_FALSE, &m[0][0]);
+    if (shader->uniforms.cameramatrix != -1)
+        glUniformMatrix4fv(shader->uniforms.cameramatrix, 1, GL_FALSE, &v[0][0]);
+    if (shader->uniforms.projectionmatrix != -1)
+        glUniformMatrix4fv(shader->uniforms.projectionmatrix, 1, GL_FALSE, &p[0][0]);
+    if (shader->uniforms.mvp != -1)
+        glUniformMatrix4fv(shader->uniforms.mvp, 1, GL_FALSE, &mvp[0][0]);
 
-    if (shader.vertex_attributes.position != -1)
-        glEnableVertexAttribArray(shader.vertex_attributes.position);
-    if (shader.vertex_attributes.uv != -1)
-        glEnableVertexAttribArray(shader.vertex_attributes.uv);
-    if (shader.vertex_attributes.normal != -1)
-        glEnableVertexAttribArray(shader.vertex_attributes.normal);
-    if (shader.vertex_attributes.color != -1)
-        glEnableVertexAttribArray(shader.vertex_attributes.color);
+    if (shader->vertex_attributes.position != -1)
+        glEnableVertexAttribArray(shader->vertex_attributes.position);
+    if (shader->vertex_attributes.uv != -1)
+        glEnableVertexAttribArray(shader->vertex_attributes.uv);
+    if (shader->vertex_attributes.normal != -1)
+        glEnableVertexAttribArray(shader->vertex_attributes.normal);
+    if (shader->vertex_attributes.color != -1)
+        glEnableVertexAttribArray(shader->vertex_attributes.color);
 
     for (uint8_t i = 0; i < 16; i++) {
-        if (shader.uniforms.textures[i] == -1)
+        if (shader->uniforms.textures[i] == -1)
             continue;
 
-        glUniform1i(shader.uniforms.textures[i], i); // Bind the location of the sampler to the texture units (0 - 15)
+        glUniform1i(shader->uniforms.textures[i], i); // Bind the location of the sampler to the texture units (0 - 15)
 
         glActiveTexture(GL_TEXTURE0 + i); // Now, connect texture unit #i to our texture #i
         glBindTexture(GL_TEXTURE_2D, textures[i]);
@@ -224,14 +224,14 @@ void Mesh::render(ShaderProgram shader) {
     );
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    if (shader.vertex_attributes.position != -1)
-        glDisableVertexAttribArray(shader.vertex_attributes.position);
-    if (shader.vertex_attributes.uv != -1)
-        glDisableVertexAttribArray(shader.vertex_attributes.uv);
-    if (shader.vertex_attributes.normal != -1)
-        glDisableVertexAttribArray(shader.vertex_attributes.normal);
-    if (shader.vertex_attributes.color != -1)
-        glDisableVertexAttribArray(shader.vertex_attributes.color);
+    if (shader->vertex_attributes.position != -1)
+        glDisableVertexAttribArray(shader->vertex_attributes.position);
+    if (shader->vertex_attributes.uv != -1)
+        glDisableVertexAttribArray(shader->vertex_attributes.uv);
+    if (shader->vertex_attributes.normal != -1)
+        glDisableVertexAttribArray(shader->vertex_attributes.normal);
+    if (shader->vertex_attributes.color != -1)
+        glDisableVertexAttribArray(shader->vertex_attributes.color);
 
     glBindVertexArray(0);
 }
