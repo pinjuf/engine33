@@ -76,13 +76,10 @@ int main() {
         shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/texture.frag")
     ));
 
-    AutoLoader autoloader = AutoLoader();
     autoloader.load_loadfile("../loadfiles/fs.load");
 
     cam = Camera();
     cam.p.position = BACKWARD * 3.0f + UP * 1.0f;
-    std::cout << "cam attach\n";
-    std::cout << autoloader.objects["plane"] << std::endl;
     cam.p.parent = &(autoloader.objects["plane"]->p);
 
     glEnable(GL_DEPTH_TEST);
