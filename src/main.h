@@ -9,16 +9,16 @@
 #include "camera.h"
 #include "shader.h"
 #include "mesh.h"
+#include "autoload.h"
 
 extern GLFWwindow * window;
 
 extern Camera cam;
+extern AutoLoader autoloader;
 extern ShaderManager shadermanager;
 
 extern double seconds; // Time since the program has been running
 extern double deltaT;
-
-extern Mesh plane;
 
 #define WIDTH 2560
 #define HEIGHT 1440

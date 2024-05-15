@@ -14,16 +14,16 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "mesh.h"
+#include "autoload.h"
 
 GLFWwindow * window;
 
 ShaderManager shadermanager;
+AutoLoader autoloader;
 Camera cam;
 
 double seconds;
 double deltaT;
-
-Mesh plane;
 
 int main() {
     if (!glfwInit()) {
@@ -76,23 +76,14 @@ int main() {
         shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/texture.frag")
     ));
 
-    plane.init_glbufs();
-    plane.shader = &plane_shader;
-    plane.load_wfobj("../models/f15.obj");
-    plane.update_mesh_bufs();
-
-    Mesh terrain;
-    terrain.init_glbufs();
-    terrain.shader = &terrain_shader;
-    terrain.load_wfobj("../models/terrain.obj");
-    terrain.update_mesh_bufs();
-
-    plane.load_texture(0, "../textures/f15.png");
-    terrain.load_texture(0, "../textures/ground.png");
+    AutoLoader autoloader = AutoLoader();
+    autoloader.load_loadfile("../loadfiles/fs.load");
 
     cam = Camera();
     cam.p.position = BACKWARD * 3.0f + UP * 1.0f;
-    cam.p.parent = &plane.p;
+    std::cout << "cam attach\n";
+    std::cout << autoloader.objects["plane"] << std::endl;
+    cam.p.parent = &(autoloader.objects["plane"]->p);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -106,8 +97,7 @@ int main() {
     do {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
-        plane.render();
-        terrain.render();
+        autoloader.render();
 
         glfwSwapBuffers(window);
 

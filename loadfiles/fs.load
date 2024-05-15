@@ -1,0 +1,8 @@
+mesh plane
+    shader ../shaders/mvp_uv.vert ../shaders/texture.frag
+    wfobj ../models/f15.obj
+    texture 0 ../textures/f15.png
+mesh terrain
+    shader ../shaders/mvp_uv.vert ../shaders/texture.frag
+    wfobj ../models/terrain.obj
+    texture 0 ../textures/ground.png

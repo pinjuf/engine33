@@ -76,7 +76,7 @@ GLuint ShaderManager::link_program(GLuint vert, GLuint frag) {
 
 ShaderProgram::ShaderProgram(GLuint id) {
     this->id = id;
-
+    
     vertex_attributes.position = glGetAttribLocation(id, "e33_vertexposition");
     vertex_attributes.uv       = glGetAttribLocation(id, "e33_vertexuv");
     vertex_attributes.normal   = glGetAttribLocation(id, "e33_vertexnormal");

@@ -3,7 +3,7 @@
 
 double mousexpos, mouseypos;
 
-double plane_speed = 20;
+double plane_speed = 0;
 
 void handle_mouse() {
     double newxpos, newypos;
@@ -16,8 +16,12 @@ void handle_mouse() {
     mousexpos = newxpos;
     mouseypos = newypos;
 
-    plane.p.orientation = glm::rotate(glm::mat4(1.0f), float(1 * deltaT * deltaxpos), glm::vec3(plane.p.orientation * glm::vec4(FORWARD, 0.0f))) * plane.p.orientation;
-    plane.p.orientation = glm::rotate(glm::mat4(1.0f), float(1 * deltaT * deltaypos), glm::vec3(plane.p.orientation * glm::vec4(RIGHT, 0.0f))) * plane.p.orientation;
+    Mesh * plane = autoloader.objects["plane"];
+    std::cout << "mouse handler\n";
+    std::cout << plane << std::endl;
 
-    plane.p.position += glm::vec3(plane.p.orientation * glm::vec4(FORWARD, 0.0f)) * (float)deltaT * (float)plane_speed;
+    plane->p.orientation = glm::rotate(glm::mat4(1.0f), float(1 * deltaT * deltaxpos), glm::vec3(plane->p.orientation * glm::vec4(FORWARD, 0.0f))) * plane->p.orientation;
+    plane->p.orientation = glm::rotate(glm::mat4(1.0f), float(1 * deltaT * deltaypos), glm::vec3(plane->p.orientation * glm::vec4(RIGHT, 0.0f))) * plane->p.orientation;
+
+    plane->p.position += glm::vec3(plane->p.orientation * glm::vec4(FORWARD, 0.0f)) * (float)deltaT * (float)plane_speed;
 }
