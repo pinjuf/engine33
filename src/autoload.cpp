@@ -30,8 +30,6 @@ void AutoLoader::load_loadfile(const char * path) {
             break;
 
         if (!strcmp(token, "mesh")) {
-            std::cout << "Defining new mesh" << std::endl;
-
             char id[256];
             fscanf(file, "%255s\n", id);
 
@@ -39,15 +37,8 @@ void AutoLoader::load_loadfile(const char * path) {
 
             objects.insert(std::make_pair(std::string(id), current_mesh));
 
-            std::cout << objects["plane"] << std::endl;
-            for(auto [k, v] : objects) {
-                std::cout<<k<<std::endl;
-            }
-
             current_mesh->init_glbufs();
         } else if (!strcmp(token, "wfobj")) {
-            std::cout << "Loading object file" << std::endl;
-
             char objfile[256];
             fscanf(file, "%255s\n", objfile);
 
@@ -57,8 +48,6 @@ void AutoLoader::load_loadfile(const char * path) {
                 current_mesh->update_mesh_bufs();
 
         } else if (!strcmp(token, "shader")) {
-            std::cout << "Loading shader" << std::endl;
-
             char vert[256], frag[256]; 
             fscanf(file, "%255s %255s\n", vert, frag);
 
@@ -72,20 +61,34 @@ void AutoLoader::load_loadfile(const char * path) {
             current_mesh->shader = shaderprog;
 
         } else if (!strcmp(token, "texture")) {
-            std::cout << "Loading texture" << std::endl;
-
             int n;
             char texpath[256];
             fscanf(file, "%d %255s\n", &n, texpath);
 
             current_mesh->load_texture(n, texpath);
         } else if (!strcmp(token, "parent")) {
-            std::cout << "Setting parent" << std::endl;
-
             char parentid[256];
             fscanf(file, "%255s\n", parentid);
 
             current_mesh->p.parent = &(objects[parentid]->p);
+        } else if (!strcmp(token, "position")) {
+            float x, y, z;
+            fscanf(file, "%f %f %f\n", &x, &y, &z);
+
+            current_mesh->p.position = glm::vec3(x, y, z);
+        } else if (!strcmp(token, "meshoffset")) { // Assumes a mesh is already loaded!
+            float dx, dy, dz;
+            fscanf(file, "%f %f %f\n", &dx, &dy, &dz);
+
+            for (size_t i = 0; i < current_mesh->vertices.size(); i += 3) {
+                current_mesh->vertices[i + 0] += dx;
+                current_mesh->vertices[i + 1] += dy;
+                current_mesh->vertices[i + 2] += dz;
+            }
+
+            if (current_mesh->shader)
+                current_mesh->update_mesh_bufs();
+
         } else {
             char ch;
             fscanf(file, "%[^\n]", &ch);
