@@ -65,17 +65,6 @@ int main() {
     glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
 
     shadermanager = ShaderManager();
-
-    ShaderProgram plane_shader(shadermanager.link_program(
-        shadermanager.load_shader(GL_VERTEX_SHADER, "../shaders/mvp_uv.vert"),
-        shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/texture.frag")
-    ));
-
-    ShaderProgram terrain_shader(shadermanager.link_program(
-        shadermanager.load_shader(GL_VERTEX_SHADER, "../shaders/mvp_uv.vert"),
-        shadermanager.load_shader(GL_FRAGMENT_SHADER, "../shaders/texture.frag")
-    ));
-
     autoloader.load_loadfile("../loadfiles/fs.load");
 
     cam = Camera();
