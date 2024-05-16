@@ -20,8 +20,7 @@ extern ShaderManager shadermanager;
 extern double seconds; // Time since the program has been running
 extern double deltaT;
 
-#define WIDTH 2560
-#define HEIGHT 1440
+extern int width, height;
 
 #define FORWARD (glm::vec3(0.0f, 0.0f, 1.0f))
 #define BACKWARD (glm::vec3(0.0f, 0.0f, -1.0f))

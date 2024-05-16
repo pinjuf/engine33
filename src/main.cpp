@@ -22,6 +22,8 @@ ShaderManager shadermanager;
 AutoLoader autoloader;
 Camera cam;
 
+int width, height;
+
 double seconds;
 double deltaT;
 
@@ -35,10 +37,9 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // OpenGL 4.6
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "engine33", glfwGetPrimaryMonitor(), NULL);
+    window = glfwCreateWindow(640, 480, "engine33", glfwGetPrimaryMonitor(), NULL);
 
-    // Hacky hack because GLFW_FLOATING doesn't work apparently
-    system("/bin/i3-msg floating enable");
+    glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 
     if (!window) {
         std::cerr << "Failed to create window" << std::endl;
@@ -81,6 +82,10 @@ int main() {
 
     size_t i = 0;
     do {
+        // Update screen size, thx @Nirex65536 (should probably only do this on window resize events - TODO?)
+        glfwGetWindowSize(window, &width, &height);
+        glViewport(0, 0, width, height);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
         autoloader.render();
