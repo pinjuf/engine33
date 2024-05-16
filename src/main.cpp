@@ -27,6 +27,16 @@ int width, height;
 double seconds;
 double deltaT;
 
+void on_window_resize(GLFWwindow * window, int new_width, int new_height) {
+    if (!new_height && !new_width)
+        glfwGetWindowSize(window, &width, &height);
+    else {
+        width = new_width;
+        height = new_height;
+    }
+    glViewport(0, 0, width, height); // Tell OpenGL about the new window size
+}
+
 int main() {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -40,6 +50,7 @@ int main() {
     window = glfwCreateWindow(640, 480, "engine33", glfwGetPrimaryMonitor(), NULL);
 
     glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     if (!window) {
         std::cerr << "Failed to create window" << std::endl;
@@ -63,6 +74,8 @@ int main() {
     }
     glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
+    glfwSetWindowSizeCallback(window, on_window_resize);
+
     glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
 
     shadermanager = ShaderManager();
@@ -81,11 +94,10 @@ int main() {
     seconds = glfwGetTime();
 
     size_t i = 0;
-    do {
-        // Update screen size, thx @Nirex65536 (should probably only do this on window resize events - TODO?)
-        glfwGetWindowSize(window, &width, &height);
-        glViewport(0, 0, width, height);
 
+    on_window_resize(window, 0, 0); // Initial resize
+
+    while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear screen
 
         autoloader.render();
@@ -105,9 +117,7 @@ int main() {
         if (i % 240 == 0)
             //printf("FPS = %f\n", 1/deltaT);
             printf("FPS = %f\n", i/seconds); // For average
-
-    } while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
-             glfwWindowShouldClose(window) == 0);
+    }
 
     return 0;
 }
