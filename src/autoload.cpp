@@ -20,14 +20,14 @@ void AutoLoader::load_loadfile(const char * path) {
     while (true) {
         char token[256];
 
-        if (fscanf(file, "%s ", token) == EOF)
+        if (fscanf(file, "%255s ", token) == EOF)
             break;
 
         if (!strcmp(token, "mesh")) {
             std::cout << "Defining new mesh" << std::endl;
 
             char id[256];
-            fscanf(file, "%s\n", id);
+            fscanf(file, "%255s\n", id);
 
             current_mesh = new Mesh();
 
@@ -43,7 +43,7 @@ void AutoLoader::load_loadfile(const char * path) {
             std::cout << "Loading object file" << std::endl;
 
             char objfile[256];
-            fscanf(file, "%s\n", objfile);
+            fscanf(file, "%255s\n", objfile);
 
             current_mesh->load_wfobj(objfile);
 
@@ -54,7 +54,7 @@ void AutoLoader::load_loadfile(const char * path) {
             std::cout << "Loading shader" << std::endl;
 
             char vert[256], frag[256]; 
-            fscanf(file, "%s %s\n", vert, frag);
+            fscanf(file, "%255s %255s\n", vert, frag);
 
             ShaderProgram * shaderprog = new ShaderProgram(
                 shadermanager.link_program(
@@ -70,9 +70,16 @@ void AutoLoader::load_loadfile(const char * path) {
 
             int n;
             char texpath[256];
-            fscanf(file, "%d %s\n", &n, texpath);
+            fscanf(file, "%d %255s\n", &n, texpath);
 
             current_mesh->load_texture(n, texpath);
+        } else if (!strcmp(token, "parent")) {
+            std::cout << "Setting parent" << std::endl;
+
+            char parentid[256];
+            fscanf(file, "%255s\n", parentid);
+
+            current_mesh->p.parent = &(objects[parentid]->p);
         } else {
             char ch;
             fscanf(file, "%[^\n]", &ch);

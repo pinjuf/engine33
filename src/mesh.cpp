@@ -32,9 +32,9 @@ void Mesh::load_wfobj(const char * path) {
     std::vector<std::string> f{};
 
     while (true) {
-        char token[128];
+        char token[256];
         // TODO: Buffer overflow possible here!
-        if (fscanf(file, "%s ", token) == EOF)
+        if (fscanf(file, "%255s ", token) == EOF)
             break;
 
         if (!strcmp(token, "v")) { // Coords
