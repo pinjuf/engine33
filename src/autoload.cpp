@@ -5,7 +5,13 @@
 
 AutoLoader::AutoLoader() {}
 
-AutoLoader::~AutoLoader() {}
+AutoLoader::~AutoLoader() {
+    for (auto [id, mesh] : objects) {
+        if (mesh->shader)
+            delete mesh->shader;
+        delete mesh;
+    }
+}
 
 void AutoLoader::load_loadfile(const char * path) {
     FILE * file = fopen(path, "r");
@@ -88,7 +94,7 @@ void AutoLoader::load_loadfile(const char * path) {
 }
 
 void AutoLoader::render() {
-    for (auto it : objects) {
-        it.second->render();
+    for (auto [id, mesh]: objects) {
+        mesh->render();
     }
 }
