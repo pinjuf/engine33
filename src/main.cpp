@@ -47,7 +47,8 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // OpenGL 4.6
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
-    window = glfwCreateWindow(640, 480, "engine33", glfwGetPrimaryMonitor(), NULL);
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    window = glfwCreateWindow(mode->width, mode->height, "engine33", glfwGetPrimaryMonitor(), NULL);
 
     glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
