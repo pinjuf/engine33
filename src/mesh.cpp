@@ -179,6 +179,11 @@ void Mesh::update_mesh_bufs() {
 void Mesh::render() {
     // Guess what this does!
 
+    if(shader == nullptr) {
+        std::cerr<<"Shader must not be null!"<<std::endl;
+        exit(1);
+    }
+
     glm::mat4 m = model_matrix();
     glm::mat4 v = cam.viewmatrix();
     glm::mat4 p = cam.projectionmatrix();
