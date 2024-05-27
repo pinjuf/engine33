@@ -2,6 +2,7 @@
 #include "main.h"
 
 #include <cstring>
+#include <fstream>
 
 AutoLoader::AutoLoader() {}
 
@@ -14,7 +15,7 @@ AutoLoader::~AutoLoader() {
 }
 
 void AutoLoader::load_loadfile(const char * path) {
-    FILE * file = fopen(path, "r");
+    std::ifstream file(path, std::ios::in);
     if (!file) {
         std::cerr << "Could not open load file " << path << std::endl;
         return;
@@ -22,76 +23,68 @@ void AutoLoader::load_loadfile(const char * path) {
 
     Mesh * current_mesh = NULL;
 
-    // TODO: This is C++, no place for fscanf!
-    while (true) {
-        char token[256];
+    while (!file.eof()) {
+        std::string token;
+        file >> token;
 
-        if (fscanf(file, "%255s ", token) == EOF)
-            break;
-
-        if (!strcmp(token, "mesh")) {
-            char id[256];
-            fscanf(file, "%255s\n", id);
+        if (token == "mesh") {
+            std::string id;
+            file >> id;
 
             current_mesh = new Mesh();
-
-            objects.insert(std::make_pair(std::string(id), current_mesh));
+            objects[id] = current_mesh;
 
             current_mesh->init_glbufs();
-        } else if (!strcmp(token, "wfobj")) {
-            char objfile[256];
-            fscanf(file, "%255s\n", objfile);
+        } else if (token == "wfobj") {
+            std::string objfile;
+            file >> objfile;
 
-            current_mesh->load_wfobj(objfile);
+            current_mesh->load_wfobj(objfile.c_str());
 
             if (current_mesh->shader) // This updates both the GL buffers themselves as well as the vertex attributes (in the shader)
                 current_mesh->update_mesh_bufs();
 
-        } else if (!strcmp(token, "shader")) {
-            char vert[256], frag[256]; 
-            fscanf(file, "%255s %255s\n", vert, frag);
+        } else if (token == "shader") {
+            std::string vert, frag; 
+            file >> vert >> frag;
 
             ShaderProgram * shaderprog = new ShaderProgram(
                 shadermanager.link_program(
-                    shadermanager.load_shader(GL_VERTEX_SHADER, vert),
-                    shadermanager.load_shader(GL_FRAGMENT_SHADER, frag)
+                    shadermanager.load_shader(GL_VERTEX_SHADER, vert.c_str()),
+                    shadermanager.load_shader(GL_FRAGMENT_SHADER, frag.c_str())
                 )
             );
 
             current_mesh->shader = shaderprog;
 
-        } else if (!strcmp(token, "texture")) {
-            int n;
-            char texpath[256];
-            fscanf(file, "%d %255s\n", &n, texpath);
+        } else if (token == "texture") {
+            std::string n;
+            std::string texpath;
+            file >> n >> texpath;
 
-            current_mesh->load_texture(n, texpath);
-        } else if (!strcmp(token, "parent")) {
-            char parentid[256];
-            fscanf(file, "%255s\n", parentid);
+            current_mesh->load_texture(std::stoi(n), texpath.c_str());
+        } else if (token == "parent") {
+            std::string parentid;
+            file >> parentid;
 
             current_mesh->p.parent = &(objects[parentid]->p);
-        } else if (!strcmp(token, "position")) {
-            float x, y, z;
-            fscanf(file, "%f %f %f\n", &x, &y, &z);
+        } else if (token == "potition") {
+            std::string x, y, z;
+            file >> x >> y >> z;
 
-            current_mesh->p.position = glm::vec3(x, y, z);
-        } else if (!strcmp(token, "meshoffset")) { // Assumes a mesh is already loaded!
-            float dx, dy, dz;
-            fscanf(file, "%f %f %f\n", &dx, &dy, &dz);
+            current_mesh->p.position = glm::vec3(std::stof(x), std::stof(y), std::stof(z));
+        } else if (token == "meshoffset") { // Assumes a mesh is already loaded!
+            std::string dx, dy, dz;
+            file >> dx >> dy >> dz;
 
             for (size_t i = 0; i < current_mesh->vertices.size(); i += 3) {
-                current_mesh->vertices[i + 0] += dx;
-                current_mesh->vertices[i + 1] += dy;
-                current_mesh->vertices[i + 2] += dz;
+                current_mesh->vertices[i + 0] += std::stof(dx);
+                current_mesh->vertices[i + 1] += std::stof(dy);
+                current_mesh->vertices[i + 2] += std::stof(dz);
             }
 
             if (current_mesh->shader)
                 current_mesh->update_mesh_bufs();
-
-        } else {
-            char ch;
-            fscanf(file, "%[^\n]", &ch);
         }
     }
 }
